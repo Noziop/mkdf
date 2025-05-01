@@ -1,0 +1,111 @@
+.TH MKDF 1 "Mai 2025" "mkdf 1.0.0" "Manuel de l'utilisateur MKDF"
+.SH NOM
+mkdf \- MaKeDir&Files, utilitaire pour créer des structures de répertoires et fichiers
+.SH SYNOPSIS
+.B mkdf
+[\fIOPTIONS\fR] [\fIEXPRESSION\fR]
+.SH DESCRIPTION
+.B mkdf
+est un utilitaire pour créer rapidement des structures de répertoires et de fichiers en utilisant une syntaxe d'expansion d'accolades ou des modèles prédéfinis.
+.PP
+Si lancé sans arguments, \fBmkdf\fR démarre en mode interactif.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Affiche l'aide et quitte.
+.TP
+.BR \-v ", " \-\-verbose
+Mode verbeux. Affiche les détails de chaque opération.
+.TP
+.BR \-q ", " \-\-quiet
+Mode silencieux. Supprime tous les messages de sortie.
+.TP
+.BR \-s ", " \-\-simulate
+Mode simulation. N'effectue pas réellement les créations.
+.TP
+.BR \-f ", " \-\-force
+Force la création même si les répertoires existent déjà.
+.TP
+.BR \-i ", " \-\-interactive
+Lance le mode interactif de MKDF.
+.TP
+.BR \-w ", " \-\-web
+Lance l'interface web de MKDF.
+.TP
+.BR \-p ", " \-\-port=\fINUMBER\fR
+Spécifie le port pour l'interface web (défaut: 8080).
+.TP
+.BR \-c ", " \-\-create=\fIPROJECT\fR \fITEMPLATE\fR
+Crée un nouveau projet basé sur un modèle prédéfini.
+.TP
+.BR \-\-version
+Affiche la version de MKDF et quitte.
+.SH SYNTAXE D'EXPANSION
+MKDF utilise une syntaxe d'expansion avec des accolades pour définir efficacement des structures complexes :
+.PP
+- \fB{a,b,c}\fR crée a, b et c au même niveau
+.PP
+- Les chemins terminés par \fB/\fR sont créés comme des répertoires
+.PP
+- Les autres sont créés comme des fichiers vides
+.PP
+- Vous pouvez imbriquer les accolades : \fB{a/{b,c},d}\fR crée a/b, a/c et d
+.SH MODÈLES DE PROJET
+Les modèles de projet suivants sont disponibles :
+.TP
+.B simple
+Structure minimaliste adaptée aux petits projets.
+.TP
+.B multi
+Structure plus complète avec séparation des composants logiques.
+.TP
+.B docker
+Structure incluant une configuration Docker.
+.TP
+.B fastapi
+Structure complète pour une application backend basée sur FastAPI.
+.TP
+.B vue-vite
+Configuration pour un projet frontend avec Vue.js et Vite.
+.TP
+.B flask
+Structure pour une application web Python avec Flask.
+.TP
+.B react
+Configuration pour une application frontend React.
+.SH EXEMPLES
+.TP
+Créer une structure simple :
+.BR "mkdf 'projet/{src/,docs/,tests/}'"
+.TP
+Créer une structure plus complexe avec imbrication :
+.BR "mkdf 'projet/{src/{models/,views/,controllers/},docs/,tests/{unit/,integration/}}'"
+.TP
+Créer des fichiers et des répertoires :
+.BR "mkdf 'projet/{README.md,src/,docs/USAGE.md}'"
+.TP
+Créer un projet à partir d'un modèle :
+.BR "mkdf -c mon-app react"
+.TP
+Lancer l'interface web :
+.BR "mkdf --web"
+.TP
+Lancer l'interface web sur un port spécifique :
+.BR "mkdf --web --port 3000"
+.SH FICHIERS
+.TP
+.I ~/.config/mkdf/config.ini
+Fichier de configuration utilisateur.
+.SH VOIR AUSSI
+.BR mkdir (1),
+.BR touch (1)
+.SH BOGUES
+Signalez les bogues à <https://github.com/Noziop/mkdf/issues>
+.SH AUTEUR
+Fassih Belmokhtar <contact@fassih.ch>
+.br
+https://github.com/Noziop
+.SH COPYRIGHT
+Copyright \(co 2025 MKDF Contributors
+.PP
+Ce programme est sous licence GNU Affero General Public License version 3 (AGPL-3.0) - voir le fichier LICENSE pour plus de détails.

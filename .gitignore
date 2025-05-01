@@ -1,0 +1,30 @@
+# Fichiers compilés
+*.o
+*.a
+*.so
+*.exe
+*.out
+
+# Fichiers binaires générés
+/mkdf
+!/mkdf.1
+!/mkdf.en.1
+
+# Dossiers de build
+/build/*
+!/build/.gitkeep
+
+# Fichiers de configuration de l'éditeur
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Autres fichiers temporaires
+*.log
+*.tmp
