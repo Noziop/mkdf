@@ -17,7 +17,7 @@
 #define PORT 8080
 #define BUFFER_SIZE 8192
 #define MAX_PATH_LEN 4096
-#define WEB_ROOT "/home/noziop/projects/mkdf/web"
+#define WEB_ROOT "~/projects/mkdf/web"
 #define PID_FILE "/tmp/mkdf_web_server.pid"
 
 // Forward declarations of functions
