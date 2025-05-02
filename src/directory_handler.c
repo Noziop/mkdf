@@ -15,6 +15,22 @@
 #define MAX_PATH_LEN 4096
 #define MAX_ALTERNATIVES 256
 
+// Variables globales pour le contrôle des modes
+static int g_home_directory_restriction = 0;
+static int g_force_mode = 0;
+static int g_verbose_mode = 0;
+static int g_quiet_mode = 0;
+static int g_web_mode = 0;  // Nouveau mode web
+
+// Fonctions pour le mode web
+void set_web_mode(int mode) {
+    g_web_mode = mode;
+}
+
+int is_web_mode(void) {
+    return g_web_mode;
+}
+
 /**
  * Structure pour stocker les alternatives d'expansion
  */
@@ -382,8 +398,8 @@ int create_directory_structure(const char *path) {
     // Préparer la variable pour stocker le chemin de base final
     char base_path[MAX_PATH_LEN] = "";
     
-    // Demander confirmation sauf en mode silencieux ou en mode force
-    if (!is_quiet_mode() && !is_force_mode()) {
+    // Demander confirmation sauf en mode silencieux, en mode force ou en mode web
+    if (!is_quiet_mode() && !is_force_mode() && !is_web_mode()) {
         printf("Vous allez générer ce projet ici : %s\n", cwd);
         printf("Êtes-vous sûr ? (O/n/chemin) : ");
         fflush(stdout);
@@ -1298,12 +1314,6 @@ int expand_tilde(const char *path, char *expanded_path, size_t size) {
 
     return 0;
 }
-
-// Variables globales pour les modes
-static int g_force_mode = 0;
-static int g_verbose_mode = 0;
-static int g_quiet_mode = 0;
-static int g_home_directory_restriction = 1; // Restriction activée par défaut
 
 // Variables globales pour la restriction des opérations au home directory
 static char user_home_dir[4096] = {0};  // Using a fixed size instead of PATH_MAX

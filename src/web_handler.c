@@ -1138,6 +1138,9 @@ int start_web_interface(void) {
     
     printf("DEBUG: g_web_root_path défini à: '%s'\n", g_web_root_path);
     
+    // Activer le mode web pour éviter les demandes de confirmation
+    set_web_mode(1);
+    
     int port = config->web_port;
     printf("DEBUG: Web port: %d\n", port);
     
@@ -1246,6 +1249,9 @@ int start_web_interface(void) {
 int start_web_interface_with_port(int port) {
     // Initialize web handler to properly load the config
     init_web_handler();
+    
+    // Activer le mode web pour éviter les demandes de confirmation
+    set_web_mode(1);
     
     // Check if server is already running
     pid_t existing_pid = read_pid_from_file();

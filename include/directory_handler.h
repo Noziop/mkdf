@@ -54,6 +54,20 @@ void enable_home_directory_restriction(void);
 void disable_home_directory_restriction(void);
 
 /**
+ * Active ou désactive le mode web (ignorer les confirmations interactives)
+ * 
+ * @param mode 1 pour activer, 0 pour désactiver
+ */
+void set_web_mode(int mode);
+
+/**
+ * Vérifie si le mode web est activé
+ * 
+ * @return 1 si activé, 0 sinon
+ */
+int is_web_mode(void);
+
+/**
  * Crée une structure de répertoires et de fichiers à partir d'un motif
  * contenant éventuellement des expressions d'accolades.
  * 
