@@ -241,9 +241,9 @@ input[type="text"]:focus, textarea:focus, select:focus {
 /* 8bit Button */
 .browse-btn {
   position: absolute;
-  right: 4px;
-  top: 4px;
-  height: calc(100% - 8px);
+  right: 0px;
+  top: 0px;
+  height: calc(50% + 5px);
   background: var(--accent-color);
   color: white;
   border: 2px solid #000;
@@ -531,7 +531,7 @@ footer {
 .theme-selector label {
   color: var(--secondary-color);
   font-size: 0.8em;
-  margin: 0;
+  margin: -10px 10px 20px 30px;
 }
 
 .theme-selector i {

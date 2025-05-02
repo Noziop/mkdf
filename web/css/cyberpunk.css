@@ -308,9 +308,9 @@ input[type="text"]:focus, textarea:focus, select:focus {
 /* Neumorphic Button */
 .browse-btn {
   position: absolute;
-  right: 5px;
-  top: 5px;
-  height: calc(100% - 10px);
+  right: 0px;
+  top: 0px;
+  height: calc(50% + 5px);
   background: var(--accent-color);
   color: white;
   border: none;
@@ -656,7 +656,7 @@ footer {
   color: var(--primary-color);
   text-shadow: var(--neon-glow);
   font-size: 0.9em;
-  margin: 0;
+  margin: -10px 10px 20px 30px;
 }
 
 .theme-selector i {

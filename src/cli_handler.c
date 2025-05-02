@@ -10,6 +10,12 @@
 #include "../include/directory_handler.h"
 #include "../include/config_handler.h"  // Make sure this include exists
 
+// Forward declarations to avoid implicit function declaration warnings
+void print_help(void);
+void print_version(void);
+int handle_web_command(const char *path);
+int handle_project_creation(const char *args);
+
 #define MAX_PATH_LEN 4096
 #define MAX_INPUT_LEN 1024
 #define MAX_MENU_ITEMS 20
@@ -1104,7 +1110,45 @@ int handle_cli_args(int argc, char *argv[]) {
         else if (strcmp(argv[i], "--config") == 0 || strcmp(argv[i], "--configure") == 0) {
             return configure_app();
         }
-        // Option de création de projet
+        // Option de création de projet avec format --create=template
+        else if (strncmp(argv[i], "--create=", 9) == 0) {
+            const char *template_name = argv[i] + 9;  // Pointer after "--create="
+            
+            // Vérifier qu'on a un chemin après cette option
+            if (i + 1 < argc) {
+                char project_path[MAX_PATH_LEN];
+                strncpy(project_path, argv[i+1], MAX_PATH_LEN - 1);
+                project_path[MAX_PATH_LEN - 1] = '\0';
+                
+                char combined_args[MAX_PATH_LEN + MAX_INPUT_LEN];
+                snprintf(combined_args, sizeof(combined_args), "%s %s", project_path, template_name);
+                i++; // Skip the next arg as we've used it
+                return handle_project_creation(combined_args);
+            } else {
+                fprintf(stderr, "Erreur: Chemin du projet manquant après --create=%s\n", template_name);
+                return EXIT_FAILURE;
+            }
+        }
+        // Option de création avec -c
+        else if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--create") == 0) {
+            // Vérifier qu'on a au moins un argument après -c
+            if (i + 1 < argc) {
+                if (i + 2 < argc) {
+                    // Format: -c path template
+                    char combined_args[MAX_PATH_LEN + MAX_INPUT_LEN];
+                    snprintf(combined_args, sizeof(combined_args), "%s %s", argv[i+1], argv[i+2]);
+                    i += 2; // Skip the next two args as we've used them
+                    return handle_project_creation(combined_args);
+                } else {
+                    // Format: -c path (use default template)
+                    return handle_project_creation(argv[i+1]);
+                }
+            } else {
+                fprintf(stderr, "Erreur: Arguments manquants après %s\n", argv[i]);
+                return EXIT_FAILURE;
+            }
+        }
+        // Option de création de projet (style ancien)
         else {
             return handle_project_creation(argv[i]);
         }
@@ -1430,14 +1474,111 @@ int handle_web_command(const char *path) {
 /**
  * Gère la création d'un projet à partir d'un modèle
  * 
- * @param template_name Nom du modèle à utiliser
+ * @param args Arguments de la ligne de commande (chemin et modèle)
  * @return Code de retour (0 = succès)
  */
-int handle_project_creation(const char *template_name) {
-    printf("Création d'un projet avec le modèle: %s\n", template_name);
+int handle_project_creation(const char *args) {
+    char project_path[MAX_PATH_LEN] = {0};
+    char template_name[MAX_INPUT_LEN] = {0};
+    char current_dir[MAX_PATH_LEN] = {0};
+    project_template_t template_type = PROJECT_SIMPLE; // Par défaut
     
-    // Cette fonction devrait être implémentée plus complètement
-    // Pour l'instant, retournons simplement un code d'erreur
-    fprintf(stderr, "La fonction handle_project_creation() n'est pas encore implémentée\n");
-    return -1;
+    // Obtenir le répertoire courant
+    if (getcwd(current_dir, sizeof(current_dir)) == NULL) {
+        perror("Erreur lors de l'obtention du répertoire courant");
+        return EXIT_FAILURE;
+    }
+    
+    // Parser les arguments (chemin et modèle optionnel)
+    const char *space_pos = strchr(args, ' ');
+    
+    if (space_pos) {
+        // Format: "chemin modèle"
+        size_t path_len = space_pos - args;
+        if (path_len >= MAX_PATH_LEN) {
+            fprintf(stderr, "Chemin trop long\n");
+            return EXIT_FAILURE;
+        }
+        
+        strncpy(project_path, args, path_len);
+        project_path[path_len] = '\0';
+        
+        // Récupérer le nom du modèle après l'espace
+        strncpy(template_name, space_pos + 1, MAX_INPUT_LEN - 1);
+        
+        // Supprimer les espaces en fin de chaîne
+        char *end = template_name + strlen(template_name) - 1;
+        while(end > template_name && isspace((unsigned char)*end)) end--;
+        end[1] = '\0';
+    } else {
+        // Seulement le chemin est spécifié
+        strncpy(project_path, args, MAX_PATH_LEN - 1);
+        
+        // Utiliser le modèle par défaut
+        strncpy(template_name, "simple", MAX_INPUT_LEN - 1);
+    }
+    
+    // Si le chemin est relatif, le compléter à partir du répertoire courant
+    if (project_path[0] != '/') {
+        char temp[MAX_PATH_LEN];
+        snprintf(temp, sizeof(temp), "%s/%s", current_dir, project_path);
+        strncpy(project_path, temp, MAX_PATH_LEN - 1);
+    }
+    
+    // Déterminer le type de modèle à utiliser
+    if (strcmp(template_name, "simple") == 0) {
+        template_type = PROJECT_SIMPLE;
+    } else if (strcmp(template_name, "multi") == 0) {
+        template_type = PROJECT_MULTI;
+    } else if (strcmp(template_name, "docker") == 0) {
+        template_type = PROJECT_DOCKER;
+    } else if (strcmp(template_name, "fastapi") == 0) {
+        template_type = PROJECT_FASTAPI;
+    } else if (strcmp(template_name, "vuevite") == 0) {
+        template_type = PROJECT_VUEVITE;
+    } else if (strcmp(template_name, "react") == 0) {
+        template_type = PROJECT_REACT;
+    } else if (strcmp(template_name, "flask") == 0) {
+        template_type = PROJECT_FLASK;
+    } else {
+        fprintf(stderr, "Type de projet non reconnu: %s\n", template_name);
+        fprintf(stderr, "Types disponibles: simple, multi, docker, fastapi, vuevite, react, flask\n");
+        return EXIT_FAILURE;
+    }
+    
+    printf("Création du projet '%s' avec le modèle '%s'...\n", project_path, template_name);
+    
+    // Vérifier si le répertoire existe déjà
+    struct stat st;
+    if (stat(project_path, &st) == 0) {
+        fprintf(stderr, "Le répertoire ou fichier '%s' existe déjà.\n", project_path);
+        return EXIT_FAILURE;
+    }
+    
+    // Créer le répertoire parent si nécessaire
+    char parent_dir[MAX_PATH_LEN];
+    strncpy(parent_dir, project_path, MAX_PATH_LEN - 1);
+    parent_dir[MAX_PATH_LEN - 1] = '\0';
+    
+    char *last_slash = strrchr(parent_dir, '/');
+    if (last_slash) {
+        *last_slash = '\0';
+        
+        // S'assurer que le répertoire parent existe
+        if (stat(parent_dir, &st) != 0) {
+            if (create_directory_recursive(parent_dir) != 0) {
+                fprintf(stderr, "Échec de la création du répertoire parent: %s\n", parent_dir);
+                return EXIT_FAILURE;
+            }
+        }
+    }
+    
+    // Créer le projet en utilisant le modèle spécifié
+    if (create_project_from_template(template_type, project_path) == EXIT_SUCCESS) {
+        printf("%sProjet créé avec succès!%s\n", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+        return EXIT_SUCCESS;
+    } else {
+        fprintf(stderr, "%sÉchec de la création du projet.%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
+        return EXIT_FAILURE;
+    }
 }
