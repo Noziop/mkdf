@@ -5,6 +5,7 @@ Bienvenue dans la documentation de MKDF (MaKeDir&Files), un outil puissant pour 
 ## Table des matières
 
 - [Guide d'installation](installation.md) - Comment installer MKDF sur votre système
+- [Configuration](configuration.md) - Comment configurer MKDF selon vos besoins
 - [Utilisation en ligne de commande](cli_usage.md) - Guide complet des commandes et options CLI
 - [Interface Web](web_usage.md) - Comment utiliser l'interface web de MKDF
 - [Modèles de projets](project_templates.md) - Les modèles prédéfinis disponibles

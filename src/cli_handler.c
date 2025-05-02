@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include "../include/cli_handler.h"
 #include "../include/directory_handler.h"
+#include "../include/config_handler.h"  // Make sure this include exists
 
 #define MAX_PATH_LEN 4096
 #define MAX_INPUT_LEN 1024
@@ -1074,189 +1075,42 @@ int stop_server(void) {
  * Analyse les arguments de la ligne de commande et exécute les commandes correspondantes
  */
 int handle_cli_args(int argc, char *argv[]) {
-    // Variables pour stocker les options
-    int verbose = 0;
-    int quiet = 0;
-    int simulate = 0;
-    int force = 0;
-    int port = 8080; // Port par défaut
-    int port_specified = 0; // Indicateur si l'option port a été spécifiée
-    
-    // Si aucun argument n'est fourni, lancer le mode interactif
+    // Si aucun argument n'est passé, démarrer le mode interactif
     if (argc == 1) {
         return start_cli_mode();
     }
 
-    // Traitement des options
+    // Traiter les options
     for (int i = 1; i < argc; i++) {
         // Option d'aide
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
-            show_help();
-            return EXIT_SUCCESS;
+            print_help();
+            return 1;
         }
         // Option de version
-        else if (strcmp(argv[i], "--version") == 0) {
-            printf("mkdf version 1.0.0\n");
-            return EXIT_SUCCESS;
+        else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
+            print_version();
+            return 1;
         }
-        // Option mode verbeux
-        else if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0) {
-            verbose = 1;
-            printf("Mode verbeux activé\n");
-        }
-        // Option mode silencieux
-        else if (strcmp(argv[i], "--quiet") == 0 || strcmp(argv[i], "-q") == 0) {
-            quiet = 1;
-            // Ne rien afficher en mode silencieux
-        }
-        // Option mode simulation
-        else if (strcmp(argv[i], "--simulate") == 0 || strcmp(argv[i], "-s") == 0) {
-            simulate = 1;
-            if (!quiet) printf("Mode simulation activé. Aucune modification ne sera effectuée.\n");
-        }
-        // Option mode force
-        else if (strcmp(argv[i], "--force") == 0 || strcmp(argv[i], "-f") == 0) {
-            force = 1;
-            if (!quiet && verbose) printf("Mode force activé. La création sera forcée même si les répertoires existent déjà.\n");
-        }
-        // Option mode interactif
-        else if (strcmp(argv[i], "--interactive") == 0 || strcmp(argv[i], "-i") == 0) {
-            if (!quiet) printf("Lancement du mode interactif...\n");
-            return start_cli_mode();
-        }
-        // Option pour créer un projet
-        else if (strcmp(argv[i], "--create") == 0 || strcmp(argv[i], "-c") == 0) {
-            // Vérifier qu'il y a un argument après --create
-            if (i + 1 < argc) {
-                const char *project_path = argv[i + 1];
-                i++; // Sauter l'argument du chemin
-                
-                // Vérifier s'il y a un type spécifié
-                project_template_t template_type = PROJECT_SIMPLE; // Type par défaut
-                if (i + 1 < argc && argv[i + 1][0] != '-') {
-                    const char *type_str = argv[i + 1];
-                    i++; // Sauter l'argument du type
-                    
-                    // Déterminer le type de projet
-                    if (strcmp(type_str, "multi") == 0) {
-                        template_type = PROJECT_MULTI;
-                    } else if (strcmp(type_str, "docker") == 0) {
-                        template_type = PROJECT_DOCKER;
-                    } else if (strcmp(type_str, "fastapi") == 0) {
-                        template_type = PROJECT_FASTAPI;
-                    } else if (strcmp(type_str, "vuevite") == 0) {
-                        template_type = PROJECT_VUEVITE;
-                    } else if (strcmp(type_str, "react") == 0) {
-                        template_type = PROJECT_REACT;
-                    } else if (strcmp(type_str, "flask") == 0) {
-                        template_type = PROJECT_FLASK;
-                    } else if (strcmp(type_str, "nodejs") == 0) {
-                        template_type = PROJECT_NODEJS;
-                    } else if (strcmp(type_str, "nextjs") == 0) {
-                        template_type = PROJECT_NEXTJS;
-                    } else if (strcmp(type_str, "nuxtjs") == 0) {
-                        template_type = PROJECT_NUXTJS;
-                    } else {
-                        if (!quiet) printf("Type de projet non reconnu : %s\n", type_str);
-                        show_help();
-                        return EXIT_FAILURE;
-                    }
-                }
-                
-                // En mode simulation, ne pas créer réellement le projet
-                if (simulate) {
-                    if (!quiet) printf("Simulation: création d'un projet de type %d à l'emplacement %s\n", template_type, project_path);
-                    return EXIT_SUCCESS;
-                }
-                
-                // Définir les options pour la création
-                set_force_mode(force);
-                set_verbose_mode(verbose);
-                set_quiet_mode(quiet);
-                
-                return create_project_from_template(template_type, project_path);
-            } else {
-                if (!quiet) printf("Erreur : chemin du projet manquant après l'option --create\n");
-                return EXIT_FAILURE;
-            }
-        }
-        // Option pour afficher la structure d'un répertoire
-        else if (strcmp(argv[i], "--tree") == 0 || strcmp(argv[i], "-t") == 0) {
-            const char *path = ".";
-            if (i + 1 < argc && argv[i + 1][0] != '-') {
-                path = argv[i + 1];
-                i++; // Sauter l'argument du chemin
-            }
-            print_directory_structure(path, 0);
-            return EXIT_SUCCESS;
-        }
-        // Option pour démarrer l'interface web
+        // Option de génération de site web
         else if (strcmp(argv[i], "--web") == 0 || strcmp(argv[i], "-w") == 0) {
-            // Vérifier si le port est spécifié
-            if (i + 1 < argc && (strcmp(argv[i + 1], "--port") == 0 || strcmp(argv[i + 1], "-p") == 0)) {
-                i++; // Sauter l'option --port
-                if (i + 1 < argc) {
-                    port = atoi(argv[i + 1]);
-                    i++; // Sauter la valeur du port
-                    port_specified = 1;
-                }
-            } else if (i + 1 < argc && strncmp(argv[i + 1], "--port=", 7) == 0) {
-                port = atoi(argv[i + 1] + 7);
-                i++; // Sauter l'argument du port
-                port_specified = 1;
-            } else if (i + 1 < argc && strncmp(argv[i + 1], "-p=", 3) == 0) {
-                port = atoi(argv[i + 1] + 3);
-                i++; // Sauter l'argument du port
-                port_specified = 1;
+            char *path = NULL;
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                path = argv[++i];
             }
-            
-            if (!quiet) printf("Démarrage de l'interface web sur le port %d...\n", port);
-            return start_web_interface_with_port(port);
+            return handle_web_command(path);
         }
-        // Option spécifique pour le port
-        else if (strcmp(argv[i], "--port") == 0 || strcmp(argv[i], "-p") == 0) {
-            if (i + 1 < argc) {
-                port = atoi(argv[i + 1]);
-                i++; // Sauter la valeur du port
-                port_specified = 1;
-                if (!quiet && verbose) printf("Port défini: %d\n", port);
-            }
-            if (port_specified && !quiet) {
-                printf("L'option -p/--port doit être utilisée avec -w/--web pour démarrer l'interface web sur un port spécifique.\n");
-                printf("Exemple d'utilisation: mkdf -w -p %d\n", port);
-            }
+        // Option de configuration
+        else if (strcmp(argv[i], "--config") == 0 || strcmp(argv[i], "--configure") == 0) {
+            return configure_app();
         }
-        // Option pour arrêter le serveur web
-        else if (strcmp(argv[i], "--stop") == 0) {
-            return stop_server();
-        }
-        // Si c'est une expression de structure de répertoires
+        // Option de création de projet
         else {
-            const char *expression = argv[i];
-            
-            // Mode simulation
-            if (simulate) {
-                if (!quiet) printf("Simulation: création de la structure '%s'\n", expression);
-                return EXIT_SUCCESS;
-            }
-            
-            // Définir les options
-            set_force_mode(force);
-            set_verbose_mode(verbose);
-            set_quiet_mode(quiet);
-            
-            // Créer la structure
-            return create_directory_structure(expression);
+            return handle_project_creation(argv[i]);
         }
     }
 
-    // Si l'option -p a été spécifiée sans -w, afficher un message d'aide
-    if (port_specified && !quiet) {
-        printf("L'option -p/--port doit être utilisée avec -w/--web pour démarrer l'interface web sur un port spécifique.\n");
-        printf("Exemple d'utilisation: mkdf -w -p %d\n", port);
-    }
-
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 /**
@@ -1320,4 +1174,270 @@ static int handle_directory_change(char *current_dir, size_t current_dir_size __
     }
     
     return 0;
+}
+
+/**
+ * Configure l'application MKDF de manière interactive
+ * 
+ * @return EXIT_SUCCESS si la configuration s'est bien déroulée, EXIT_FAILURE sinon
+ */
+int configure_app(void) {
+    printf(ANSI_CLEAR_SCREEN);
+    printf("%s%sCONFIGURATION MKDF%s\n\n", ANSI_BOLD, ANSI_COLOR_CYAN, ANSI_COLOR_RESET);
+    
+    // Charger la configuration actuelle
+    mkdf_config_t *config = get_global_config();
+    if (!config) {
+        fprintf(stderr, "Erreur: Impossible de charger la configuration\n");
+        return EXIT_FAILURE;
+    }
+    
+    // Sauvegarder l'ancienne configuration pour comparer les changements
+    mkdf_config_t old_config = *config;
+    
+    // Menu de configuration
+    menu_t config_menu;
+    init_menu(&config_menu, "Options de configuration");
+    add_menu_item(&config_menu, "Nom d'auteur par défaut");
+    add_menu_item(&config_menu, "Template de projet par défaut");
+    add_menu_item(&config_menu, "Thème CSS par défaut");
+    add_menu_item(&config_menu, "Langue de l'interface");
+    add_menu_item(&config_menu, "Port du serveur Web");
+    add_menu_item(&config_menu, "Mode debug");
+    add_menu_item(&config_menu, "Sauvegarder et quitter");
+    add_menu_item(&config_menu, "Quitter sans sauvegarder");
+    
+    // Templates disponibles
+    const char *templates[] = {
+        "simple", 
+        "multi", 
+        "docker", 
+        "fastapi", 
+        "vuevite", 
+        "react", 
+        "flask"
+    };
+    int num_templates = sizeof(templates) / sizeof(templates[0]);
+    
+    // Thèmes CSS disponibles
+    const char *css_themes[] = {
+        "light", 
+        "dark", 
+        "cyberpunk", 
+        "8bit", 
+        "girly"
+    };
+    int num_css_themes = sizeof(css_themes) / sizeof(css_themes[0]);
+    
+    // Langues disponibles
+    const char *languages[] = {
+        "fr", 
+        "en"
+    };
+    int num_languages = sizeof(languages) / sizeof(languages[0]);
+    
+    int running = 1;
+    
+    while (running) {
+        int choice = handle_menu(&config_menu);
+        
+        switch (choice) {
+            case 0: // Nom d'auteur
+                printf(ANSI_CLEAR_SCREEN);
+                printf("Nom d'auteur actuel: %s\n\n", config->author_name[0] ? config->author_name : "(non défini)");
+                prompt_input("Nouveau nom d'auteur", config->author_name, sizeof(config->author_name));
+                break;
+                
+            case 1: // Template par défaut
+                {
+                    printf(ANSI_CLEAR_SCREEN);
+                    printf("Template actuel: %s\n\n", config->default_template[0] ? config->default_template : "(non défini)");
+                    
+                    menu_t template_menu;
+                    init_menu(&template_menu, "Sélectionner un template par défaut");
+                    
+                    for (int i = 0; i < num_templates; i++) {
+                        add_menu_item(&template_menu, templates[i]);
+                    }
+                    
+                    int template_choice = handle_menu(&template_menu);
+                    
+                    if (template_choice >= 0 && template_choice < num_templates) {
+                        strncpy(config->default_template, templates[template_choice], sizeof(config->default_template) - 1);
+                    }
+                }
+                break;
+                
+            case 2: // Thème CSS par défaut
+                {
+                    printf(ANSI_CLEAR_SCREEN);
+                    printf("Thème CSS actuel: %s\n\n", config->default_css[0] ? config->default_css : "(non défini)");
+                    
+                    menu_t css_menu;
+                    init_menu(&css_menu, "Sélectionner un thème CSS par défaut");
+                    
+                    for (int i = 0; i < num_css_themes; i++) {
+                        add_menu_item(&css_menu, css_themes[i]);
+                    }
+                    
+                    int css_choice = handle_menu(&css_menu);
+                    
+                    if (css_choice >= 0 && css_choice < num_css_themes) {
+                        strncpy(config->default_css, css_themes[css_choice], sizeof(config->default_css) - 1);
+                    }
+                }
+                break;
+                
+            case 3: // Langue de l'interface
+                {
+                    printf(ANSI_CLEAR_SCREEN);
+                    printf("Langue actuelle: %s\n\n", config->language[0] ? config->language : "(non défini)");
+                    
+                    menu_t lang_menu;
+                    init_menu(&lang_menu, "Sélectionner une langue");
+                    
+                    for (int i = 0; i < num_languages; i++) {
+                        add_menu_item(&lang_menu, languages[i]);
+                    }
+                    
+                    int lang_choice = handle_menu(&lang_menu);
+                    
+                    if (lang_choice >= 0 && lang_choice < num_languages) {
+                        strncpy(config->language, languages[lang_choice], sizeof(config->language) - 1);
+                    }
+                }
+                break;
+                
+            case 4: // Port du serveur Web
+                {
+                    printf(ANSI_CLEAR_SCREEN);
+                    printf("Port actuel: %d\n\n", config->web_port);
+                    
+                    char port_str[10];
+                    prompt_input("Nouveau port (1024-65535)", port_str, sizeof(port_str));
+                    
+                    // Convertir en entier et valider
+                    if (port_str[0] != '\0') {
+                        int port = atoi(port_str);
+                        if (port >= 1024 && port <= 65535) {
+                            config->web_port = port;
+                        } else {
+                            printf("%sPort invalide. Doit être entre 1024 et 65535.%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
+                            printf("\nAppuyez sur Entrée pour continuer...");
+                            getchar();
+                        }
+                    }
+                }
+                break;
+                
+            case 5: // Mode debug
+                {
+                    printf(ANSI_CLEAR_SCREEN);
+                    printf("Mode debug actuel: %s\n\n", config->debug_mode ? "Activé" : "Désactivé");
+                    
+                    menu_t debug_menu;
+                    init_menu(&debug_menu, "Mode debug");
+                    add_menu_item(&debug_menu, "Activer");
+                    add_menu_item(&debug_menu, "Désactiver");
+                    
+                    int debug_choice = handle_menu(&debug_menu);
+                    
+                    if (debug_choice == 0) {
+                        config->debug_mode = 1;
+                    } else if (debug_choice == 1) {
+                        config->debug_mode = 0;
+                    }
+                }
+                break;
+                
+            case 6: // Sauvegarder et quitter
+                {
+                    // Sauvegarder la configuration
+                    if (save_config(config) == 0) {
+                        printf("%sConfiguration sauvegardée avec succès!%s\n", ANSI_COLOR_GREEN, ANSI_COLOR_RESET);
+                    } else {
+                        printf("%sErreur lors de la sauvegarde de la configuration.%s\n", ANSI_COLOR_RED, ANSI_COLOR_RESET);
+                    }
+                    
+                    running = 0;
+                    break;
+                }
+                
+            case 7: // Quitter sans sauvegarder
+            case -1: // Échap
+                {
+                    // Restaurer l'ancienne configuration
+                    *config = old_config;
+                    printf("Configuration non sauvegardée.\n");
+                    running = 0;
+                    break;
+                }
+        }
+    }
+    
+    return EXIT_SUCCESS;
+}
+
+/**
+ * Affiche l'aide du programme
+ */
+void print_help(void) {
+    printf("Usage: mkdf [OPTIONS] [PATH]\n");
+    printf("\n");
+    printf("Options:\n");
+    printf("  --help, -h              Affiche cette aide\n");
+    printf("  --version, -v           Affiche la version du programme\n");
+    printf("  --web, -w               Démarre l'interface web\n");
+    printf("  --port=PORT             Spécifie le port pour l'interface web (défaut: 8080)\n");
+    printf("  --config, --configure   Configure l'application\n");
+    printf("  --create=TEMPLATE       Crée un projet à partir d'un modèle\n");
+    printf("                          Modèles disponibles: simple, multi, docker, fastapi,\n");
+    printf("                                               vuevite, react, flask\n");
+    printf("\n");
+    printf("Sans option, démarre en mode interactif dans le répertoire spécifié ou courant.\n");
+}
+
+/**
+ * Affiche la version du programme
+ */
+void print_version(void) {
+    printf("MKDF version 1.0.0\n");
+    printf("Copyright (C) 2023-2025\n");
+    printf("License: MIT\n");
+}
+
+/**
+ * Gère la commande web avec un chemin optionnel
+ * 
+ * @param path Chemin optionnel vers le répertoire à servir
+ * @return Code de retour (0 = succès)
+ */
+int handle_web_command(const char *path) {
+    // Initialiser le gestionnaire web avec le chemin spécifié
+    printf("Démarrage du serveur web...\n");
+    
+    // Initialize config to get port and theme
+    init_config();
+    mkdf_config_t *config = get_global_config();
+    
+    printf("Le serveur web démarrera sur http://localhost:%d\n", config->web_port);
+    printf("Utilisation du thème: %s\n", config->default_css);
+    
+    // Appeler la fonction start_web_interface dans web_handler.c
+    return start_web_interface();
+}
+
+/**
+ * Gère la création d'un projet à partir d'un modèle
+ * 
+ * @param template_name Nom du modèle à utiliser
+ * @return Code de retour (0 = succès)
+ */
+int handle_project_creation(const char *template_name) {
+    printf("Création d'un projet avec le modèle: %s\n", template_name);
+    
+    // Cette fonction devrait être implémentée plus complètement
+    // Pour l'instant, retournons simplement un code d'erreur
+    fprintf(stderr, "La fonction handle_project_creation() n'est pas encore implémentée\n");
+    return -1;
 }

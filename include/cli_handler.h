@@ -35,6 +35,13 @@ int create_project_from_template(project_template_t template_type, const char *p
 int stop_server(void);
 
 /**
+ * Lance l'interface de configuration interactive
+ * 
+ * @return EXIT_SUCCESS en cas de succès, EXIT_FAILURE en cas d'erreur
+ */
+int configure_app(void);
+
+/**
  * Analyse les arguments de la ligne de commande et exécute les commandes correspondantes
  * 
  * @param argc Nombre d'arguments

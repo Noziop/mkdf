@@ -20,6 +20,7 @@ MKDF (MaKeDir&Files) combine les fonctionnalités de `mkdir -p` et `touch` en un
 - 📦 Modèles de projets prédéfinis (React, Flask, FastAPI, Vue+Vite, etc.)
 - 🛠️ Structures personnalisées avec syntaxe expressive
 - 🏠 Support pour l'expansion du tilde (~) dans les chemins
+- ⚙️ Configuration personnalisable via ~/.config/mkdf/config
 
 ## Installation
 
@@ -60,6 +61,9 @@ mkdf -c ~/projects/api-server fastapi
 
 # Créer des fichiers à partir de templates
 mkdf 'projet/{README.md:/chemin/vers/template.md,config.json:/chemin/vers/config.json}'
+
+# Configuration
+mkdf --config    # Configure l'application
 ```
 
 Pour une documentation complète de l'interface en ligne de commande, consultez le [Guide d'utilisation CLI](docs/FR/cli_usage.md).
@@ -86,6 +90,37 @@ MKDF utilise une syntaxe d'expansion avec des accolades pour définir efficaceme
 - Les autres sont créés comme des fichiers vides
 - Vous pouvez imbriquer les accolades : `{a/{b,c},d}` crée a/b, a/c et d
 - Pour utiliser un template : `fichier.txt:/chemin/vers/template.txt` crée fichier.txt avec le contenu du template
+
+## Configuration
+
+MKDF peut être configuré via un fichier de configuration situé dans `~/.config/mkdf/config`. Ce fichier est créé automatiquement lors de la première utilisation ou lors de l'installation.
+
+### Options de configuration
+
+Le fichier de configuration contient les paramètres suivants :
+
+```
+# Chemin vers les fichiers web
+WEB_ROOT=/chemin/vers/repertoire/web
+
+# Port du serveur web
+WEB_PORT=8080
+
+# Mode debug (0=désactivé, 1=activé)
+DEBUG_MODE=0
+
+# Répertoire des templates
+TEMPLATE_DIR=/chemin/vers/repertoire/templates
+
+# Paramètre régional
+LOCALE=fr_FR
+```
+
+### Modifier la configuration
+
+Vous pouvez modifier la configuration de deux façons :
+1. En éditant directement le fichier `~/.config/mkdf/config`
+2. En utilisant la commande `mkdf --config` qui ouvre le fichier de configuration dans votre éditeur par défaut
 
 ## Documentation complète
 

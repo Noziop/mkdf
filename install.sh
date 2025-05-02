@@ -69,6 +69,18 @@ if [ "$LANGUAGE" = "EN" ]; then
     MSG_CHECK_INSTALL="To verify that MKDF is correctly installed, run:"
     MSG_CREATE_CONFIG="To create a default configuration, you can create a file:"
     MSG_THANKS="Thank you for installing MKDF!"
+    # New messages for user configuration
+    MSG_CONFIG_SETTINGS="Configuration settings"
+    MSG_INTERFACE_LANG="Select interface language (en/fr) [default: en]: "
+    MSG_WEB_LOCATION="Where would you like to install web files? [default: ~/.config/mkdf/web]: "
+    MSG_WEBSERVER_PORT="Web server port [default: 8888]: "
+    MSG_AUTHOR_NAME="Enter your name (for templates) [default: User]: "
+    MSG_SELECT_THEME="Select CSS theme [default: light]:"
+    MSG_THEME_OPTS="Available themes: light, dark, cyberpunk, 8bit, girly"
+    MSG_DEFAULT_TEMPLATE="Select default project template [default: simple]:"
+    MSG_TEMPLATE_OPTS="Available templates: simple, multi, docker, fastapi, vuevite, react, flask"
+    MSG_DEBUG_MODE="Enable debug mode? (y/n) [default: n]: "
+    MSG_COPYING_WEB="Copying web files to" 
 else
     # Messages en français (existants)
     MSG_WELCOME="MKDF - MaKeDir&Files\nScript d'installation"
@@ -110,6 +122,18 @@ else
     MSG_CHECK_INSTALL="Pour vérifier que MKDF est correctement installé, exécutez :"
     MSG_CREATE_CONFIG="Pour créer une configuration par défaut, vous pouvez créer un fichier :"
     MSG_THANKS="Merci d'avoir installé MKDF !"
+    # New messages for user configuration
+    MSG_CONFIG_SETTINGS="Paramètres de configuration"
+    MSG_INTERFACE_LANG="Sélectionnez la langue d'interface (en/fr) [défaut: fr]: "
+    MSG_WEB_LOCATION="Où souhaitez-vous installer les fichiers web? [défaut: ~/.config/mkdf/web]: "
+    MSG_WEBSERVER_PORT="Port du serveur web [défaut: 8888]: "
+    MSG_AUTHOR_NAME="Entrez votre nom (pour les templates) [défaut: Utilisateur]: "
+    MSG_SELECT_THEME="Sélectionnez le thème CSS [défaut: light]:"
+    MSG_THEME_OPTS="Thèmes disponibles: light, dark, cyberpunk, 8bit, girly"
+    MSG_DEFAULT_TEMPLATE="Sélectionnez le template de projet par défaut [défaut: simple]:"
+    MSG_TEMPLATE_OPTS="Templates disponibles: simple, multi, docker, fastapi, vuevite, react, flask"
+    MSG_DEBUG_MODE="Activer le mode debug? (o/n) [défaut: n]: "
+    MSG_COPYING_WEB="Copie des fichiers web vers"
 fi
 
 # Message de bienvenue
@@ -204,6 +228,102 @@ case $INSTALL_TYPE in
         ;;
 esac
 
+# Configuration personnalisée
+echo ""
+echo -e "${BLUE}$MSG_CONFIG_SETTINGS${NC}"
+
+# 1. Langue de l'interface
+if [ "$LANGUAGE" = "EN" ]; then
+    DEFAULT_LANG="en"
+else
+    DEFAULT_LANG="fr"
+fi
+echo -n "$MSG_INTERFACE_LANG"
+read -r USER_LANG
+USER_LANG=${USER_LANG:-$DEFAULT_LANG}
+if [ "$USER_LANG" = "en" ]; then
+    CONFIG_LANG="en"
+    CONFIG_LOCALE="en_US"
+else
+    CONFIG_LANG="fr"
+    CONFIG_LOCALE="fr_FR"
+fi
+
+# 2. Emplacement du serveur web
+DEFAULT_WEB_ROOT="$HOME/.config/mkdf/web"
+echo -n "$MSG_WEB_LOCATION"
+read -r WEB_ROOT
+WEB_ROOT=${WEB_ROOT:-$DEFAULT_WEB_ROOT}
+
+# 3. Port à utiliser
+DEFAULT_PORT="8080"
+echo -n "$MSG_WEBSERVER_PORT"
+read -r WEB_PORT
+WEB_PORT=${WEB_PORT:-$DEFAULT_PORT}
+
+# 4. Nom d'auteur
+if [ "$LANGUAGE" = "EN" ]; then
+    DEFAULT_AUTHOR="User"
+else
+    DEFAULT_AUTHOR="Utilisateur"
+fi
+echo -n "$MSG_AUTHOR_NAME"
+read -r AUTHOR_NAME
+AUTHOR_NAME=${AUTHOR_NAME:-$DEFAULT_AUTHOR}
+
+# 5. Thème CSS
+echo "$MSG_SELECT_THEME"
+echo "$MSG_THEME_OPTS"
+DEFAULT_THEME="light"
+echo -n "[light/dark/cyberpunk/8bit/girly]: "
+read -r CSS_THEME
+CSS_THEME=${CSS_THEME:-$DEFAULT_THEME}
+
+# Vérifier que le thème est valide
+case $CSS_THEME in
+    light|dark|cyberpunk|8bit|girly)
+        ;;
+    *)
+        CSS_THEME="light"
+        ;;
+esac
+
+# 6. Template par défaut
+echo "$MSG_DEFAULT_TEMPLATE"
+echo "$MSG_TEMPLATE_OPTS"
+DEFAULT_TEMPLATE="simple"
+echo -n "[simple/multi/docker/fastapi/vuevite/react/flask]: "
+read -r TEMPLATE_DEFAULT
+TEMPLATE_DEFAULT=${TEMPLATE_DEFAULT:-$DEFAULT_TEMPLATE}
+
+# Vérifier que le template est valide
+case $TEMPLATE_DEFAULT in
+    simple|multi|docker|fastapi|vuevite|react|flask)
+        ;;
+    *)
+        TEMPLATE_DEFAULT="simple"
+        ;;
+esac
+
+# 7. Activer debug
+if [ "$LANGUAGE" = "EN" ]; then
+    echo -n "$MSG_DEBUG_MODE"
+    read -r DEBUG_CHOICE
+    if [[ $DEBUG_CHOICE =~ ^[Yy]$ ]]; then
+        DEBUG_MODE="1"
+    else
+        DEBUG_MODE="0"
+    fi
+else
+    echo -n "$MSG_DEBUG_MODE"
+    read -r DEBUG_CHOICE
+    if [[ $DEBUG_CHOICE =~ ^[Oo]$ ]]; then
+        DEBUG_MODE="1"
+    else
+        DEBUG_MODE="0"
+    fi
+fi
+
 echo ""
 echo -e "${YELLOW}$MSG_COMPILING${NC}"
 make clean
@@ -215,7 +335,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Définir le man correcte en fonction de la langue
-if [ "$LANGUAGE" = "EN" ]; then
+if [ "$USER_LANG" = "en" ]; then
     MAN_FILE="mkdf.en.1"
 else
     MAN_FILE="mkdf.1"
@@ -243,12 +363,60 @@ echo -e "${GREEN}$MSG_INSTALL_SUCCESS${NC}"
 echo -e "${YELLOW}$MSG_CONFIG_DIR${NC}"
 mkdir -p ~/.config/mkdf
 
-# Si la langue est l'anglais, créer un fichier de configuration pour définir la langue
-if [ "$LANGUAGE" = "EN" ]; then
-    echo "language=en" > ~/.config/mkdf/config.ini
+# Création du répertoire web et copie des fichiers
+echo -e "${YELLOW}$MSG_COPYING_WEB $WEB_ROOT${NC}"
+mkdir -p "$WEB_ROOT"
+mkdir -p "$WEB_ROOT/css"
+
+# Copie des fichiers web
+cp -f "$(dirname "$0")/web/index.html" "$WEB_ROOT/"
+cp -f "$(dirname "$0")/web/css"/* "$WEB_ROOT/css/"
+
+# Création du fichier de configuration
+if [ "$USER_LANG" = "en" ]; then
+    cat > ~/.config/mkdf/config << EOF
+# MKDF Configuration File
+# Generated during installation on $(date)
+
+# Web interface directory path
+WEB_ROOT_PATH=$WEB_ROOT
+
+# Web server port
+WEB_PORT=$WEB_PORT
+
+# Debug mode (0=off, 1=on)
+DEBUG_MODE=$DEBUG_MODE
+
+# Templates directory
+TEMPLATE_DIR=$PREFIX/share/mkdf/templates
+
+# Locale setting
+LOCALE=$CONFIG_LOCALE
+EOF
 else
-    echo "language=fr" > ~/.config/mkdf/config.ini
+    cat > ~/.config/mkdf/config << EOF
+# Fichier de configuration MKDF
+# Généré lors de l'installation le $(date)
+
+# Chemin vers les fichiers web
+WEB_ROOT_PATH=$WEB_ROOT
+
+# Port du serveur web
+WEB_PORT=$WEB_PORT
+
+# Mode debug (0=désactivé, 1=activé)
+DEBUG_MODE=$DEBUG_MODE
+
+# Répertoire des templates
+TEMPLATE_DIR=$PREFIX/share/mkdf/templates
+
+# Paramètre régional
+LOCALE=$CONFIG_LOCALE
+EOF
 fi
+
+# Créer aussi le fichier config.ini pour la compatibilité
+echo "language=$CONFIG_LANG" > ~/.config/mkdf/config.ini
 
 # Vérifier si le répertoire bin de l'installation est dans le PATH
 if [[ ":$PATH:" != *":$PREFIX/bin:"* ]] && [ $INSTALL_TYPE -eq 2 ]; then
@@ -268,8 +436,4 @@ echo -e "${BLUE}=== $MSG_POST_INSTALL ===${NC}"
 echo "$MSG_CHECK_INSTALL"
 echo "  mkdf --version"
 echo ""
-echo "$MSG_CREATE_CONFIG"
-echo "  ~/.config/mkdf/config.ini"
-echo ""
-echo "$MSG_THANKS"
 echo -e "${BLUE}===============================================${NC}"

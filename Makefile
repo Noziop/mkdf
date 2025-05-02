@@ -9,7 +9,7 @@ MANDIR = $(PREFIX)/share/man
 MAN_FILE ?= mkdf.1
 
 # Source files
-SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/directory_handler.c $(SRC_DIR)/cli_handler.c $(SRC_DIR)/web_handler.c
+SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/directory_handler.c $(SRC_DIR)/cli_handler.c $(SRC_DIR)/web_handler.c $(SRC_DIR)/config_handler.c
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 # Main target

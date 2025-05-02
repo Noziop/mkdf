@@ -13,11 +13,12 @@
 #include <libgen.h> /* Pour basename() */
 #include "../include/web_handler.h"
 #include "../include/directory_handler.h"
+#include "../include/config_handler.h" // Ajout de l'inclusion pour le gestionnaire de config
 
-#define PORT 8080
+// Suppression de la définition codée en dur de PORT
 #define BUFFER_SIZE 8192
 #define MAX_PATH_LEN 4096
-#define WEB_ROOT "~/projects/mkdf/web"
+// Suppression de la définition codée en dur de WEB_ROOT
 #define PID_FILE "/tmp/mkdf_web_server.pid"
 
 // Forward declarations of functions
@@ -33,6 +34,31 @@ pid_t web_server_pid;
 typedef struct {
     int client_fd;
 } thread_args_t;
+
+// Global static variable for storing web_root path
+static char g_web_root_path[MAX_PATH_LEN];
+
+// Function to initialize the web handler (called at program startup)
+int init_web_handler(void) {
+    // Initialize config system if not already done
+    init_config();
+    
+    // Get global configuration
+    mkdf_config_t *config = get_global_config();
+    
+    // Copy web_root path to global variable
+    strncpy(g_web_root_path, config->web_root_path, sizeof(g_web_root_path) - 1);
+    g_web_root_path[sizeof(g_web_root_path) - 1] = '\0';
+    
+    // Print VERY detailed debug information
+    printf("\n==== WEB HANDLER INITIALIZATION ====\n");
+    printf("Config web_root_path: '%s'\n", config->web_root_path);
+    printf("g_web_root_path set to: '%s'\n", g_web_root_path);
+    printf("Web port: %d\n", config->web_port);
+    printf("==============================\n\n");
+    
+    return 0;
+}
 
 // Signal handler for graceful termination
 static void handle_signal(int sig) {
@@ -78,7 +104,10 @@ static pid_t read_pid_from_file(void) {
 // Function to read the index.html file from the web folder
 static char* read_html_template() {
     char file_path[MAX_PATH_LEN];
-    snprintf(file_path, sizeof(file_path), "%s/index.html", WEB_ROOT);
+    snprintf(file_path, sizeof(file_path), "%s/index.html", g_web_root_path);
+    
+    // Print debug information
+    printf("Trying to open HTML template at: %s\n", file_path);
     
     // Open the file
     FILE *file = fopen(file_path, "r");
@@ -111,7 +140,7 @@ static char* read_html_template() {
 // Function to read a CSS file from the web folder
 static char* read_css_file(const char *css_path) {
     char file_path[MAX_PATH_LEN];
-    snprintf(file_path, sizeof(file_path), "%s/%s", WEB_ROOT, css_path);
+    snprintf(file_path, sizeof(file_path), "%s/%s", g_web_root_path, css_path);
     
     // Open the file
     FILE *file = fopen(file_path, "r");
@@ -1087,14 +1116,37 @@ int stop_web_interface(void) {
     }
 }
 
-// Function signature corrected to match declaration in header
+// Function to start web interface with correct port from configuration
 int start_web_interface(void) {
+    printf("DEBUG: Entrée dans start_web_interface()\n");
+
+    // Force une réinitialisation complète
+    g_web_root_path[0] = '\0'; 
+
+    // Initialize config system first
+    init_config();
+    
+    // Get global configuration
+    mkdf_config_t *config = get_global_config();
+    
+    // Déboggage de la configuration
+    printf("DEBUG: Configuration chargée - web_root_path: '%s'\n", config->web_root_path);
+    
+    // Copy web_root path to global variable - EXPLICITEMENT
+    strncpy(g_web_root_path, config->web_root_path, sizeof(g_web_root_path) - 1);
+    g_web_root_path[sizeof(g_web_root_path) - 1] = '\0';
+    
+    printf("DEBUG: g_web_root_path défini à: '%s'\n", g_web_root_path);
+    
+    int port = config->web_port;
+    printf("DEBUG: Web port: %d\n", port);
+    
     // Check if server is already running
     pid_t existing_pid = read_pid_from_file();
     if (existing_pid > 0) {
         // Check if the process with this PID exists
         if (kill(existing_pid, 0) == 0) {
-            printf("Web server is already running at http://localhost:%d (PID: %d)\n", PORT, existing_pid);
+            printf("Web server is already running at http://localhost:%d (PID: %d)\n", port, existing_pid);
             printf("To stop the server, use: mkdf --stop\n");
             return EXIT_FAILURE;
         } else {
@@ -1136,7 +1188,7 @@ int start_web_interface(void) {
     // Set up server address structure
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    address.sin_port = htons(port);
     
     // Bind the socket to the port
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
@@ -1152,7 +1204,7 @@ int start_web_interface(void) {
         return EXIT_FAILURE;
     }
 
-    printf("Web server started on http://localhost:%d\n", PORT);
+    printf("Web server started on http://localhost:%d\n", port);
     printf("Press Ctrl+C to stop the server\n");
     
     // Accept and handle incoming connections
@@ -1192,6 +1244,9 @@ int start_web_interface(void) {
 
 // Function to start web interface with custom port
 int start_web_interface_with_port(int port) {
+    // Initialize web handler to properly load the config
+    init_web_handler();
+    
     // Check if server is already running
     pid_t existing_pid = read_pid_from_file();
     if (existing_pid > 0) {
