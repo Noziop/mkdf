@@ -1098,6 +1098,10 @@ int handle_cli_args(int argc, char *argv[]) {
             print_version();
             return 1;
         }
+        // Option de mode raw (sans template)
+        else if (strcmp(argv[i], "--raw") == 0 || strcmp(argv[i], "-r") == 0) {
+            set_raw_mode(1);  // Active le mode raw
+        }
         // Option de génération de site web
         else if (strcmp(argv[i], "--web") == 0 || strcmp(argv[i], "-w") == 0) {
             char *path = NULL;

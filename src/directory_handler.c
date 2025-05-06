@@ -20,7 +20,8 @@ static int g_home_directory_restriction = 0;
 static int g_force_mode = 0;
 static int g_verbose_mode = 0;
 static int g_quiet_mode = 0;
-static int g_web_mode = 0;  // Nouveau mode web
+static int g_web_mode = 0;  // Mode web
+static int g_raw_mode = 0;  // Mode raw pour créer la structure exacte sans template
 
 // Fonctions pour le mode web
 void set_web_mode(int mode) {
@@ -82,15 +83,55 @@ static int create_file(const char *path) {
         return -1;
     }
     
-    // Créer le fichier
-    FILE *file = fopen(path, "w");
-    if (file == NULL) {
-        fprintf(stderr, "Failed to create file '%s': %s\n", path, strerror(errno));
-        return -1;
+    // Mode raw: créer simplement le fichier sans appliquer de template
+    if (g_raw_mode) {
+        // Créer le fichier
+        FILE *file = fopen(path, "w");
+        if (file == NULL) {
+            fprintf(stderr, "Failed to create file '%s': %s\n", path, strerror(errno));
+            return -1;
+        }
+        
+        fclose(file);
+        if (!is_quiet_mode()) {
+            printf("Created file: %s\n", path);
+        }
+        return 0;
+    } else {
+        // Mode template (comportement habituel): créer un répertoire avec la structure
+        // Pour un chemin comme "file.txt", on va créer le répertoire "file.txt" avec src/, docs/ et README.md
+        if (create_directory_recursive(path) != 0) {
+            return -1;
+        }
+        
+        // Créer la structure de répertoires standard dans le dossier
+        char src_dir[MAX_PATH_LEN];
+        char docs_dir[MAX_PATH_LEN];
+        char readme_file[MAX_PATH_LEN];
+        
+        snprintf(src_dir, sizeof(src_dir), "%s/src/", path);
+        snprintf(docs_dir, sizeof(docs_dir), "%s/docs/", path);
+        snprintf(readme_file, sizeof(readme_file), "%s/README.md", path);
+        
+        // Créer les sous-répertoires
+        if (create_directory_recursive(src_dir) != 0) {
+            return -1;
+        }
+        
+        if (create_directory_recursive(docs_dir) != 0) {
+            return -1;
+        }
+        
+        // Créer le fichier README.md
+        FILE *readme = fopen(readme_file, "w");
+        if (readme == NULL) {
+            fprintf(stderr, "Failed to create README file: %s\n", readme_file);
+            return -1;
+        }
+        
+        fclose(readme);
+        return 0;
     }
-    
-    fclose(file);
-    return 0;
 }
 
 /**
@@ -398,6 +439,18 @@ int create_directory_structure(const char *path) {
     // Préparer la variable pour stocker le chemin de base final
     char base_path[MAX_PATH_LEN] = "";
     
+    // Afficher le message pour le mode raw si activé
+    if (g_raw_mode && !is_quiet_mode()) {
+        printf("Mode raw activé: création de structure exacte sans template\n");
+    }
+    
+    // Message d'information sur le projet à créer
+    if (!is_quiet_mode()) {
+        printf("Création du projet '%s'%s...\n", 
+               path, 
+               g_raw_mode ? "" : " avec le modèle 'simple'");
+    }
+    
     // Demander confirmation sauf en mode silencieux, en mode force ou en mode web
     if (!is_quiet_mode() && !is_force_mode() && !is_web_mode()) {
         printf("Vous allez générer ce projet ici : %s\n", cwd);
@@ -608,18 +661,50 @@ int create_directory_structure(const char *path) {
         } 
         // Pas de slash final, c'est un fichier
         else {
-            if (create_file(full_path) != 0) {
-                if (!is_quiet_mode()) {
-                    fprintf(stderr, "Failed to create file: %s\n", full_path);
+            // Mode raw: créer un fichier simple sans structure de template
+            if (g_raw_mode) {
+                // Créer les répertoires parents d'abord
+                char *dir_path = strdup(full_path);
+                if (!dir_path) {
+                    fprintf(stderr, "Memory allocation error when creating file: %s\n", full_path);
+                    continue;
                 }
-                // Continuer avec les autres chemins
-            } else if (!is_quiet_mode()) {
-                printf("Created file: %s\n", full_path);
+                char *dir_name = dirname(dir_path);
+                if (create_directory_recursive(dir_name) != 0) {
+                    fprintf(stderr, "Failed to create parent directories for: %s\n", full_path);
+                    free(dir_path);
+                    continue;
+                }
+                free(dir_path);
+                
+                // Créer le fichier vide
+                FILE *file = fopen(full_path, "w");
+                if (file == NULL) {
+                    fprintf(stderr, "Failed to create file '%s': %s\n", full_path, strerror(errno));
+                    continue;
+                }
+                fclose(file);
+                
+                if (!is_quiet_mode()) {
+                    printf("Created file: %s\n", full_path);
+                }
+            } 
+            // Mode normal: utiliser la fonction create_file() qui applique le template
+            else {
+                if (create_file(full_path) != 0) {
+                    if (!is_quiet_mode()) {
+                        fprintf(stderr, "Failed to create file: %s\n", full_path);
+                    }
+                    // Continuer avec les autres chemins
+                }
             }
         }
     }
     
     free(paths);
+    if (!is_quiet_mode()) {
+        printf("Projet créé avec succès!\n");
+    }
     return EXIT_SUCCESS;
 }
 
@@ -1431,6 +1516,19 @@ int is_verbose_mode(void) {
 
 int is_quiet_mode(void) {
     return g_quiet_mode;
+}
+
+// Fonction pour activer ou désactiver le mode raw (sans template)
+void set_raw_mode(int mode) {
+    g_raw_mode = mode;
+    if (g_raw_mode && !is_quiet_mode()) {
+        printf("Mode raw activé: création de structure exacte sans template\n");
+    }
+}
+
+// Fonction pour vérifier si le mode raw est activé
+int is_raw_mode(void) {
+    return g_raw_mode;
 }
 
 // Vérification si une chaîne est au format template (fichier:template)

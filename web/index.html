@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>mkdf - Créateur de Structures de Projets</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link id="theme-stylesheet" rel="stylesheet" href="css/light.css">
+    <link id="theme-stylesheet" rel="stylesheet" href="css/{{THEME}}.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Styles pour le modal d'explorateur de fichiers */
@@ -671,6 +671,12 @@
             const themeStylesheet = document.getElementById('theme-stylesheet');
             themeStylesheet.href = `css/${theme}.css`;
         }
+        
+        // Définir le thème correct dans le sélecteur au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentTheme = document.getElementById('theme-stylesheet').href.split('/').pop().replace('.css', '');
+            document.getElementById('theme-select').value = currentTheme;
+        });
     </script>
 </body>
 </html>

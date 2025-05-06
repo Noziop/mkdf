@@ -140,6 +140,18 @@ int is_verbose_mode(void);
 int is_quiet_mode(void);
 
 /**
+ * Set the raw mode (create exact structure without applying templates)
+ * 
+ * @param mode 1 to enable raw mode, 0 to disable
+ */
+void set_raw_mode(int mode);
+
+/**
+ * Check if raw mode is enabled
+ */
+int is_raw_mode(void);
+
+/**
  * Crée un fichier à partir d'un template
  * 
  * @param dest_path Chemin où créer le fichier

@@ -275,13 +275,13 @@ AUTHOR_NAME=${AUTHOR_NAME:-$DEFAULT_AUTHOR}
 echo "$MSG_SELECT_THEME"
 echo "$MSG_THEME_OPTS"
 DEFAULT_THEME="light"
-echo -n "[light/dark/cyberpunk/8bit/girly]: "
+echo -n "[light/dark/cyberpunk/8bit/girly/manga]: "
 read -r CSS_THEME
 CSS_THEME=${CSS_THEME:-$DEFAULT_THEME}
 
 # Vérifier que le thème est valide
 case $CSS_THEME in
-    light|dark|cyberpunk|8bit|girly)
+    light|dark|cyberpunk|8bit|girly|manga)
         ;;
     *)
         CSS_THEME="light"
@@ -371,6 +371,9 @@ mkdir -p "$WEB_ROOT/css"
 # Copie des fichiers web
 cp -f "$(dirname "$0")/web/index.html" "$WEB_ROOT/"
 cp -f "$(dirname "$0")/web/css"/* "$WEB_ROOT/css/"
+
+# Remplacer le placeholder {{THEME}} par le thème choisi
+sed -i "s/{{THEME}}/$CSS_THEME/g" "$WEB_ROOT/index.html"
 
 # Création du fichier de configuration
 if [ "$USER_LANG" = "en" ]; then
