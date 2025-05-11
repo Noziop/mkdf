@@ -5,13 +5,18 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <limits.h>
 #include "../include/fs/path_analyzer.h"
 
 /**
  * Détermine si un chemin correspond à un répertoire, basé sur plusieurs heuristiques
  */
 bool is_directory_path(const char *path) {
-    if (!path) return false;
+    // Vérifier si le chemin est nul ou vide
+    if (!path) {
+        fprintf(stderr, "Erreur : chemin NULL passé à is_directory_path()\n");
+        return false;
+    }
     
     size_t len = strlen(path);
     
@@ -190,4 +195,16 @@ int extract_template_info(const char *path, char *dest_path, char *template_path
     template_path[size - 1] = '\0';
     
     return 0;
+}
+
+/**
+ * Vérifie si un chemin est valide 
+ */
+bool is_valid_path(const char *path) {
+    if (!path) return false;
+    if (strlen(path) > PATH_MAX) {
+        fprintf(stderr, "Chemin trop long (max %d caractères)\n", PATH_MAX);
+        return false;
+    }
+    return true;
 }

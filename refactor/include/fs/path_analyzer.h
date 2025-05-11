@@ -3,6 +3,13 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <limits.h>
+#include <unistd.h>
+
+#ifndef PATH_MAX
+/* Définir directement une valeur sûre au lieu de se baser sur _POSIX_PATH_MAX */
+#define PATH_MAX 4096  /* Valeur standard sur la plupart des systèmes Linux */
+#endif /* PATH_MAX */
 
 /**
  * Détermine si un chemin correspond à un répertoire
@@ -56,5 +63,14 @@ bool is_template_path(const char *path);
  * @return 0 si succès, -1 si erreur
  */
 int extract_template_info(const char *path, char *dest_path, char *template_path, size_t size);
+
+/**
+ * Vérifie si un chemin est valide
+ * 
+ * @param path Le chemin à vérifier
+ * @return true si le chemin est valide, false sinon
+ */
+bool is_valid_path(const char *path);
+
 
 #endif /* PATH_ANALYZER_H */

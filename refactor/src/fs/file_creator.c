@@ -26,8 +26,17 @@ bool file_exists(const char *path) {
 /**
  * Crée un fichier vide à l'emplacement spécifié
  */
-int create_empty_file(const char *path) {
+int create_empty_file(const char *path, bool force) {
     if (!path) return -1;
+
+    // Vérifier si le fichier existe déjà et ajout du paramètre force
+    if (file_exists(path)) {
+        if (!force) {
+            printf("Le fichier '%s' existe déjà. Écraser ? (y/n) ", path);
+            char response = getchar();
+            if (response != 'y' && response != 'Y') return 0;
+        }
+    }
     
     // Ouvrir le fichier en écriture, le créer s'il n'existe pas
     FILE *file = fopen(path, "w");
@@ -113,7 +122,7 @@ int create_file(const char *path, bool force) {
     
     char *parent_dir = dirname(path_copy);
     if (strlen(parent_dir) > 0 && strcmp(parent_dir, ".") != 0) {
-        create_directory_recursive(parent_dir);
+        create_directory_recursive(parent_dir, force);
     }
     
     free(path_copy);
@@ -132,6 +141,6 @@ int create_file(const char *path, bool force) {
         return create_file_from_template(dest_path, template_path);
     } else {
         // Créer un fichier vide
-        return create_empty_file(path);
+        return create_empty_file(path, force);
     }
 }

@@ -20,7 +20,7 @@ int create_directory(const char *path);
  * @param path Chemin du répertoire à créer
  * @return 0 si succès, -1 si erreur
  */
-int create_directory_recursive(const char *path);
+int create_directory_recursive(const char *path, bool force);
 
 /**
  * Crée une structure de répertoires d'après un chemin expansé

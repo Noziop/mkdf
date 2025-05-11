@@ -3,6 +3,10 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdbool.h>  // Ajouté
+#include <stddef.h>   // Ajouté
+#include <stdlib.h>   // Ajouté
+#include <string.h>   // Ajouté
 
 /**
  * Structure pour stocker le résultat de l'expansion d'accolades

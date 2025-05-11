@@ -10,7 +10,7 @@
  * @param path Chemin du fichier à créer
  * @return 0 si succès, -1 si erreur
  */
-int create_empty_file(const char *path);
+int create_empty_file(const char *path, bool force);
 
 /**
  * Crée un fichier à partir d'un template

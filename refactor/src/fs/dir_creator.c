@@ -47,8 +47,18 @@ bool directory_exists(const char *path) {
 /**
  * Crée un répertoire et tous ses parents si nécessaire (mkdir -p)
  */
-int create_directory_recursive(const char *path) {
+int create_directory_recursive(const char *path, bool force) {
     if (!path) return -1;
+
+    // Ajout du paramètre force    
+    if (directory_exists(path)) {
+        if (!force) {
+            printf("Le répertoire '%s' existe déjà. Continuer ? (y/n) ", path);
+            char response = getchar();
+            if (response != 'y' && response != 'Y') return 0;
+        }
+        return 0;
+    }
     
     // Si le répertoire existe déjà, rien à faire
     if (directory_exists(path)) {
@@ -127,5 +137,5 @@ int create_directory_structure(const char *path, bool force) {
     }
     
     // Créer le répertoire et ses parents
-    return create_directory_recursive(path);
+    return create_directory_recursive(path, force);
 }
