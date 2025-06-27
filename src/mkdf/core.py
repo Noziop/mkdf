@@ -55,6 +55,7 @@ def create_from_template(project_name, template_type, components=None, base_path
         }
 
     factory = TemplateFactory()
+    project_path = os.path.join(base_path, project_name)
     try:
         if template_type == 'docker':
             from .templates.docker_templates import get_docker_template
@@ -62,8 +63,8 @@ def create_from_template(project_name, template_type, components=None, base_path
         else:
             template = factory.create_template(template_type, components)
 
-        create_directory(project_name)
-        _create_from_template_recursive(project_name, template)
+        create_directory(project_path)
+        _create_from_template_recursive(project_path, template)
         print(f"Successfully created project '{project_name}' from template '{template_type}'.")
     except ValueError as e:
         show_error(f"Error creating project: {e}", "Please check the template type and components.")
