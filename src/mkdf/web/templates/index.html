@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MKDF - Professional Project Creator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --error-color: #dc2626;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1e293b;
+            --bg-secondary: #0f172a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .navbar {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .brand .version {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background-color: var(--bg-secondary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background: var(--bg-primary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            height: fit-content;
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .quick-btn {
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .quick-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .main-content {
+            background: var(--bg-primary);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .tabs-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .tab-content {
+            padding: 2rem;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .tree-preview {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Fira Code', monospace; /* Assuming Fira Code or similar is available */
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .component-category {
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .component-category h4 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .component-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .component-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 0.375rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .component-item:hover {
+            border-color: var(--primary-color);
+        }
+
+        .component-checkbox {
+            margin: 0;
+        }
+
+        .notifications {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            .sidebar {
+                order: 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand">
+            <h1><i class="fas fa-folder-plus"></i> MKDF</h1>
+            <span class="version">v1.0.0</span>
+        </div>
+        <div class="controls">
+            <button id="theme-toggle" class="btn"><i class="fas fa-moon"></i></button>
+            <button id="help-btn" class="btn"><i class="fas fa-question-circle"></i></button>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+            <div class="quick-actions">
+                <button class="quick-btn" data-action="simple">
+                    <i class="fas fa-folder"></i> Simple Project
+                </button>
+                <button class="quick-btn" data-action="react">
+                    <i class="fab fa-react"></i> React App
+                </button>
+                <button class="quick-btn" data-action="fastapi">
+                    <i class="fas fa-server"></i> FastAPI Server
+                </button>
+                <button class="quick-btn" data-action="full-stack">
+                    <i class="fas fa-layer-group"></i> Full Stack
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" data-tab="pattern">
+                    <i class="fas fa-code-branch"></i> Pattern Creator
+                </button>
+                <button class="tab-btn" data-tab="templates">
+                    <i class="fas fa-file-code"></i> Templates
+                </button>
+                <button class="tab-btn" data-tab="docker">
+                    <i class="fab fa-docker"></i> Docker Combos
+                </button>
+                <button class="tab-btn" data-tab="history">
+                    <i class="fas fa-history"></i> History
+                </button>
+            </nav>
+
+            <div id="pattern-tab" class="tab-content active">
+                <h2>Pattern Creator</h2>
+                <form id="pattern-form">
+                    <div class="form-group">
+                        <label for="pattern-input" class="form-label">Pattern:</label>
+                        <input type="text" id="pattern-input" class="form-input" placeholder="Enter pattern (e.g., myapp/{src/,docs/,README.md})" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Preview:</label>
+                        <pre id="preview-tree" class="tree-preview"></pre>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Project</button>
+                </form>
+            </div>
+
+            <div id="templates-tab" class="tab-content">
+                <h2>Templates</h2>
+                <form id="template-form">
+                    <div class="form-group">
+                        <label for="template-project-name" class="form-label">Project Name:</label>
+                        <input type="text" id="template-project-name" class="form-input" name="project_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="template-type" class="form-label">Template Type:</label>
+                        <select id="template-type" class="form-input" name="template_type">
+                            <option value="simple">Simple</option>
+                            <option value="low_level">Low Level (C/C++)</option>
+                            <option value="react">React</option>
+                            <option value="vue">Vue</option>
+                            <option value="flask">Flask</option>
+                            <option value="fastapi">FastAPI</option>
+                            <option value="express">Express</option>
+                            <option value="laravel">Laravel</option>
+                            <option value="slim">Slim</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Project</button>
+                </form>
+            </div>
+
+            <div id="docker-tab" class="tab-content">
+                <h2>Docker Combos</h2>
+                <form id="docker-form">
+                    <div class="form-group">
+                        <label for="docker-project-name" class="form-label">Project Name:</label>
+                        <input type="text" id="docker-project-name" class="form-input" name="project_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Components:</label>
+                        <div class="component-grid">
+                            <div class="component-category">
+                                <h4>Backend</h4>
+                                <div class="component-list" id="backend-components-list">
+                                </div>
+                            </div>
+                            <div class="component-category">
+                                <h4>Frontend</h4>
+                                <div class="component-list" id="frontend-components-list">
+                                </div>
+                            </div>
+                            <div class="component-category">
+                                <h4>Databases</h4>
+                                <div class="component-list" id="database-components-list">
+                                </div>
+                            </div>
+                            <div class="component-category">
+                                <h4>Other</h4>
+                                <div class="component-list" id="other-components-list">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Docker Compose Preview:</label>
+                        <pre id="docker-compose-preview" class="tree-preview"></pre>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Create Project</button>
+                </form>
+            </div>
+
+            <div id="history-tab" class="tab-content">
+                <h2>History</h2>
+                <p>Recent projects will appear here.</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="notifications" class="notifications"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme Toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            if (currentTheme === 'dark') {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+
+            themeToggle.addEventListener('click', () => {
+                let theme = document.documentElement.getAttribute('data-theme');
+                if (theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+            });
+
+            // Tab Navigation
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    button.classList.add('active');
+                    document.getElementById(button.dataset.tab + '-tab').classList.add('active');
+                });
+            });
+
+            // Notification System
+            const notificationsContainer = document.getElementById('notifications');
+
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.classList.add('notification', type);
+                notification.textContent = message;
+                notificationsContainer.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+
+            // Pattern Creator Logic
+            const patternInput = document.getElementById('pattern-input');
+            const previewTree = document.getElementById('preview-tree');
+            const patternForm = document.getElementById('pattern-form');
+
+            const updatePatternPreview = async () => {
+                const pattern = patternInput.value;
+                if (pattern) {
+                    try {
+                        const response = await fetch('/preview_pattern', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ pattern: pattern }),
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            previewTree.textContent = data.tree;
+                        } else {
+                            previewTree.textContent = `Error: ${data.error}`;
+                        }
+                    } catch (error) {
+                        previewTree.textContent = `Error fetching preview: ${error}`;
+                    }
+                } else {
+                    previewTree.textContent = '';
+                }
+            };
+
+            patternInput.addEventListener('input', updatePatternPreview);
+
+            patternForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const pattern = patternInput.value;
+                try {
+                    const response = await fetch('/create_pattern', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ pattern: pattern }),
+                    });
+                    const data = await response.json();
+                    showNotification(data.message, data.success ? 'success' : 'error');
+                } catch (error) {
+                    showNotification(`Error creating project: ${error}`, 'error');
+                }
+            });
+
+            // Template Form Logic
+            const templateForm = document.getElementById('template-form');
+            templateForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const projectName = document.getElementById('template-project-name').value;
+                const templateType = document.getElementById('template-type').value;
+
+                try {
+                    const response = await fetch('/create_template', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ project_name: projectName, template_type: templateType }),
+                    });
+                    const data = await response.json();
+                    showNotification(data.message, data.success ? 'success' : 'error');
+                } catch (error) {
+                    showNotification(`Error creating project: ${error}`, 'error');
+                }
+            });
+
+            // Docker Form Logic
+            const dockerForm = document.getElementById('docker-form');
+            const dockerComponentsCheckboxes = document.querySelectorAll('input[name="components"]');
+            const dockerComposePreview = document.getElementById('docker-compose-preview');
+
+            const updateDockerComposePreview = async () => {
+                const components = Array.from(dockerComponentsCheckboxes)
+                                    .filter(cb => cb.checked)
+                                    .map(cb => cb.value);
+                if (components.length > 0) {
+                    try {
+                        const response = await fetch('/preview_docker_compose', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ components: components }),
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            dockerComposePreview.textContent = data.compose_yml;
+                        } else {
+                            dockerComposePreview.textContent = `Error: ${data.error}`;
+                        }
+                    } catch (error) {
+                        dockerComposePreview.textContent = `Error fetching Docker Compose preview: ${error}`;
+                    }
+                } else {
+                    dockerComposePreview.textContent = '';
+                }
+            };
+
+            dockerComponentsCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateDockerComposePreview);
+            });
+
+            dockerForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const projectName = document.getElementById('docker-project-name').value;
+                const components = Array.from(dockerComponentsCheckboxes)
+                                    .filter(cb => cb.checked)
+                                    .map(cb => cb.value);
+
+                try {
+                    const response = await fetch('/create_docker', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ project_name: projectName, components: components }),
+                    });
+                    const data = await response.json();
+                    showNotification(data.message, data.success ? 'success' : 'error');
+                } catch (error) {
+                    showNotification(`Error creating project: ${error}`, 'error');
+                }
+            });
+
+            // Quick Actions
+            const quickActionButtons = document.querySelectorAll('.quick-btn');
+            quickActionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const action = button.dataset.action;
+                    // Simulate clicking the corresponding tab and filling form
+                    if (action === 'simple') {
+                        document.querySelector('[data-tab="templates"]').click();
+                        document.getElementById('template-type').value = 'simple';
+                    } else if (action === 'react') {
+                        document.querySelector('[data-tab="templates"]').click();
+                        document.getElementById('template-type').value = 'react';
+                    } else if (action === 'fastapi') {
+                        document.querySelector('[data-tab="templates"]').click();
+                        document.getElementById('template-type').value = 'fastapi';
+                    } else if (action === 'full-stack') {
+                        document.querySelector('[data-tab="docker"]').click();
+                        // Pre-select some common full-stack components
+                        document.getElementById('docker-fastapi').checked = true;
+                        document.getElementById('docker-vue').checked = true;
+                        document.getElementById('docker-postgresql').checked = true;
+                        document.getElementById('docker-nginx').checked = true;
+                        updateDockerComposePreview();
+                    }
+                    showNotification(`Quick action: ${action} selected.`, 'info');
+                });
+            });
+
+            // Dynamic Docker Components
+            const backendComponentsList = document.getElementById('backend-components-list');
+            const frontendComponentsList = document.getElementById('frontend-components-list');
+            const databaseComponentsList = document.getElementById('database-components-list');
+            const otherComponentsList = document.getElementById('other-components-list');
+
+            const fetchDockerComponents = async () => {
+                try {
+                    const response = await fetch('/api/docker_components');
+                    const components = await response.json();
+
+                    components.forEach(component => {
+                        const label = document.createElement('label');
+                        label.classList.add('component-item');
+                        label.innerHTML = `<input type="checkbox" class="component-checkbox" name="components" value="${component}"> ${component.charAt(0).toUpperCase() + component.slice(1)}`;
+                        
+                        // Categorize components (this logic should ideally come from backend)
+                        if (['fastapi', 'flask', 'express', 'laravel', 'slim', 'django', 'springboot', 'aspnet', 'gofiber', 'echo', 'ruby-rails'].includes(component)) {
+                            backendComponentsList.appendChild(label);
+                        } else if (['react', 'vue', 'nextjs', 'nuxtjs', 'angular', 'svelte', 'static'].includes(component)) {
+                            frontendComponentsList.appendChild(label);
+                        } else if (['postgresql', 'mysql', 'mongodb', 'redis', 'mariadb', 'rabbitmq', 'kafka'].includes(component)) {
+                            databaseComponentsList.appendChild(label);
+                        } else if (['nginx', 'traefik', 'caddy', 'monitoring'].includes(component)) {
+                            otherComponentsList.appendChild(label);
+                        }
+                    });
+
+                    // Re-attach event listeners after dynamic content is loaded
+                    document.querySelectorAll('input[name="components"]').forEach(checkbox => {
+                        checkbox.addEventListener('change', updateDockerComposePreview);
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching Docker components:', error);
+                    showNotification('Error loading Docker components.', 'error');
+                }
+            };
+
+            fetchDockerComponents();
+        });
+    </script>
+</body>
+</html>

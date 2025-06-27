@@ -1,0 +1,14 @@
+{
+    "react": {
+        "description": "A simple React project.",
+        "structure": {
+            "public/": {
+                "index.html": ""
+            },
+            "src/": {
+                "App.js": ""
+            },
+            "package.json": ""
+        }
+    }
+}
