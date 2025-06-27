@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ${PROJECT_NAME:-fullstack}-backend
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-dbname}
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgresql
+    networks:
+      - fullstack-app_app-network
+
+  vue:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ${PROJECT_NAME:-fullstack}-frontend
+    ports:
+      - 3000:3000
+    environment:
+      - VITE_API_URL=http://localhost/api
+    volumes:
+      - ./frontend:/app
+    networks:
+      - fullstack-app_app-network
+
+networks:
+  fullstack-app_app-network:
+    driver: bridge
+    ipam: {'config': [{'subnet': '172.18.0.0/16'}]}
