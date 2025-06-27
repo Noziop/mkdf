@@ -46,6 +46,7 @@ ENV/
 
 # === MKDF Specific ===
 all_files_content.txt
+man.txt
 *.dump
 *.tmp
 test_projects/
