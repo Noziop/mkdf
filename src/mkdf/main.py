@@ -1,4 +1,4 @@
-from .cli.cli_parser import app
+from .cli.parsers.main_parser import app
 
 def main():
     app()
