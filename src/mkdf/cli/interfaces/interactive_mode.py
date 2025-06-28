@@ -30,6 +30,6 @@ def start_interactive_mode(banner_callback=None):
             interactive_create_docker_combo(banner_callback)
         elif choice == '4':
             interactive_configure_settings(banner_callback)
-        elif choice == '5':
-            print("Exiting MKDF Interactive Mode. Goodbye!")
+        elif choice == '0':
+            print("Exiting MKDF Interactive Mode. Thank you for using MKDF! Goodbye!")
             break

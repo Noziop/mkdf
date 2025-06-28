@@ -3,36 +3,53 @@ from rich.table import Table
 
 from ...templates.template_factory import TEMPLATE_CATEGORIES
 from ...templates.factories.env_factory import EnvFactory
+from ..models.mappings import create_template_mapping
 
 def show_templates_table():
     """Display available templates in a beautiful Rich table"""
     console = Console()
 
-    table = Table(title=" Available Templates", show_header=True, header_style="bold magenta")
+    table = Table(title=" Available Templates", show_header=True, header_style="bold white")
 
     table.add_column("Backend API", justify="center", style="white", width=12)
-    table.add_column("Frontend", justify="center", style="white", width=10)
-    table.add_column("Fullstack", justify="center", style="white", width=10)
-    table.add_column("Static", justify="center", style="white", width=10)
-    table.add_column("Mobile", justify="center", style="white", width=12)
-    table.add_column("Desktop", justify="center", style="white", width=10)
+    table.add_column("Frontend SPA", justify="center", style="white", width=12)
+    table.add_column("Fullstack", justify="center", style="white", width=12)
+    table.add_column("Static Site", justify="center", style="white", width=12)
 
-    max_items = max(len(templates) for templates in TEMPLATE_CATEGORIES.values())
+    template_map = create_template_mapping()
+    
+    backend_templates = [(k, v) for k, v in template_map.items() if v in TEMPLATE_CATEGORIES.get("Backend API", []) and k.isdigit()]
+    frontend_templates = [(k, v) for k, v in template_map.items() if v in TEMPLATE_CATEGORIES.get("Frontend SPA", []) and k.isdigit()]
+    fullstack_templates = [(k, v) for k, v in template_map.items() if v in TEMPLATE_CATEGORIES.get("Fullstack", []) and k.isdigit()]
+    static_templates = [(k, v) for k, v in template_map.items() if v in TEMPLATE_CATEGORIES.get("Static Site", []) and k.isdigit()]
+
+    max_items = max(len(backend_templates), len(frontend_templates), len(fullstack_templates), len(static_templates))
 
     for i in range(max_items):
         row = []
-        for category, templates in TEMPLATE_CATEGORIES.items():
-            if i < len(templates):
-                row.append(templates[i])
-            else:
-                row.append("")
+        if i < len(backend_templates):
+            row.append(f"{backend_templates[i][0]}. {backend_templates[i][1]}")
+        else:
+            row.append("")
+        if i < len(frontend_templates):
+            row.append(f"{frontend_templates[i][0]}. {frontend_templates[i][1]}")
+        else:
+            row.append("")
+        if i < len(fullstack_templates):
+            row.append(f"{fullstack_templates[i][0]}. {fullstack_templates[i][1]}")
+        else:
+            row.append("")
+        if i < len(static_templates):
+            row.append(f"{static_templates[i][0]}. {static_templates[i][1]}")
+        else:
+            row.append("")
         table.add_row(*row)
 
     console.print(table)
 
 def show_docker_components_table():
     console = Console()
-    table = Table(title=" Docker Components", show_header=True, header_style="bold magenta")
+    table = Table(title=" Docker Components", show_header=True, header_style="bold white")
 
     table.add_column("Backend", justify="center", style="white", width=12)
     table.add_column("Frontend", justify="center", style="white", width=12)
@@ -40,7 +57,7 @@ def show_docker_components_table():
     table.add_column("Database", justify="center", style="white", width=14)
     table.add_column("Cache/Queue", justify="center", style="white", width=12)
     table.add_column("Proxy", justify="center", style="white", width=12)
-    table.add_column("Monitoring", justify="center", style="white", width=12)
+    table.add_column("Monitoring", justify="center", style="white", width=14)
 
     max_items = max(len(components) for components in EnvFactory.DOCKER_COMPONENT_CATEGORIES.values())
 
@@ -109,7 +126,7 @@ def show_main_menu():
     table.add_row("2", " Create from template")
     table.add_row("3", " Create Docker combo")
     table.add_row("4", " Configure settings")
-    table.add_row("5", " Exit")
+    table.add_row("0", " Exit")
 
     console = Console()
     console.print(table)
