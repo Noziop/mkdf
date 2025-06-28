@@ -4,6 +4,7 @@ import subprocess
 import time
 import os
 from mkdf.web.server import find_free_port
+from mkdf.templates.factories.env_factory import EnvFactory
 
 @pytest.fixture(scope="module")
 def live_server_url():

@@ -9,7 +9,7 @@ from ..fs.dir_creator import create_directory
 from ..fs.file_creator import create_file
 from ..templates.template_factory import TemplateFactory, TEMPLATE_CATEGORIES
 from ..config.config_manager import ConfigManager
-from ..templates.docker_templates import DOCKER_COMPONENT_CATEGORIES
+from ..templates.factories.env_factory import EnvFactory
 
 config_manager = ConfigManager()
 
@@ -243,9 +243,8 @@ def interactive_create_from_template(banner_callback=None):
             components = None
             port_config = None
             if template_type == 'docker':
-                from ..templates.docker_templates import DOCKER_MODULES
                 print("Available Docker Components:")
-                for comp_name in DOCKER_MODULES.keys():
+                for comp_name in EnvFactory.DOCKER_COMPONENT_CATEGORIES.keys():
                     print(f"- {comp_name}")
                 components_input = input("Enter Docker components (e.g., fastapi vue monitoring), separated by space: ")
                 components = components_input.split()
@@ -364,11 +363,11 @@ def show_docker_components_table():
     table.add_column("Monitoring", justify="center", style="white", width=12)
 
     # Create rows by filling each category column
-    max_items = max(len(components) for components in DOCKER_COMPONENT_CATEGORIES.values())
+    max_items = max(len(components) for components in EnvFactory.DOCKER_COMPONENT_CATEGORIES.values())
 
     for i in range(max_items):
         row = []
-        for category, components in DOCKER_COMPONENT_CATEGORIES.items():
+        for category, components in EnvFactory.DOCKER_COMPONENT_CATEGORIES.items():
             if i < len(components):
                 row.append(components[i])
             else:
@@ -380,7 +379,7 @@ def show_docker_components_table():
 def create_component_mapping():
     """Create mapping for sequential numbers and component names"""
     components_flat = []
-    for category, components in DOCKER_COMPONENT_CATEGORIES.items():
+    for category, components in EnvFactory.DOCKER_COMPONENT_CATEGORIES.items():
         components_flat.extend(components)
 
     component_map = {}

@@ -1,12 +1,12 @@
 import unittest
-from src.mkdf.templates.docker.base.compose_builder import get_docker_template
+from src.mkdf.templates.factories.docker_factory import DockerComposeFactory
 
 class TestDockerGeneration(unittest.TestCase):
 
     def test_fastapi_mariadb_combo(self):
         components = ['fastapi', 'mariadb']
         project_name = 'test-project'
-        project_structure = get_docker_template(components, project_name)
+        project_structure = DockerComposeFactory.create(components, project_name)
 
         # Verify .env file
         self.assertIn('.env', project_structure)
@@ -39,7 +39,7 @@ class TestDockerGeneration(unittest.TestCase):
     def test_django_postgres_combo(self):
         components = ['django', 'postgresql']
         project_name = 'django-project'
-        project_structure = get_docker_template(components, project_name)
+        project_structure = DockerComposeFactory.create(components, project_name)
 
         # Verify .env file
         self.assertIn('.env', project_structure)

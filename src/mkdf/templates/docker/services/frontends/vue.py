@@ -22,13 +22,7 @@ class VueService(DockerService):
             'ports': ['3000'],
             'environment': environment,
             'volumes': ['./frontend:/app'],
-            'networks': ['app-network'],
-            'labels': [
-                "traefik.enable=true",
-                "traefik.http.routers.frontend.rule=Host(`localhost`)",
-                "traefik.http.routers.frontend.entrypoints=web",
-                "traefik.http.services.frontend.loadbalancer.server.port=3000"
-            ]
+            'networks': ['app-network']
         }
 
     def get_dockerfile_content(self):
@@ -110,16 +104,16 @@ createApp(App).mount('#app')
 </template>
 
 <script>
-export default {
+export default {{
   name: 'App'
-}
+}}
 </script>
 
 <style>
-#app {
+#app {{
   text-align: center;
   padding: 20px;
-  font-family: Avenir, Helvetica, Arial, sans-serif;}
+  font-family: Avenir, Helvetica, Arial, sans-serif;}}
 </style>
 '''
         }

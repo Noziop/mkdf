@@ -22,13 +22,7 @@ class AngularService(DockerService):
             'ports': ['4200'],
             'environment': environment,
             'volumes': ['./frontend:/app'],
-            'networks': ['app-network'],
-            'labels': [
-                "traefik.enable=true",
-                "traefik.http.routers.frontend.rule=Host(`localhost`)",
-                "traefik.http.routers.frontend.entrypoints=web",
-                "traefik.http.services.frontend.loadbalancer.server.port=4200"
-            ]
+            'networks': ['app-network']
         }
 
     def get_dockerfile_content(self):

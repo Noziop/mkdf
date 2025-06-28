@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Union, Any
 from .base_templates import get_simple_template, get_low_level_template
 from .web_templates import get_react_template, get_vue_template, get_flask_template, get_fastapi_template, get_express_template, get_laravel_template, get_slim_template, get_nextjs_template, get_nuxtjs_template, get_angular_template, get_svelte_template, get_static_template, get_django_template, get_springboot_template, get_aspnet_template, get_gofiber_template, get_echo_template, get_ruby_rails_template
-from .docker_templates import get_docker_template, PortConfig, ProjectStructure
+from .factories.docker_factory import DockerComposeFactory, PortConfig, ProjectStructure
 
 TEMPLATE_CATEGORIES = {
 "Backend API": ["fastapi", "flask", "express", "gofiber"],
@@ -35,13 +35,13 @@ class TemplateFactory:
             'gofiber': get_gofiber_template,
             'echo': get_echo_template,
             'ruby_rails': get_ruby_rails_template,
-            'docker': get_docker_template,
+            'docker': DockerComposeFactory.create,
         }
 
-    def create_template(self, template_type: str, components: Optional[List[str]] = None, port_config: Optional[PortConfig] = None) -> ProjectStructure:
+    def create_template(self, template_type: str, components: Optional[List[str]] = None, port_config: Optional[PortConfig] = None, project_name: Optional[str] = None) -> ProjectStructure:
         creator = self.creators.get(template_type)
         if not creator:
             raise ValueError(f"Unknown template type: {template_type}")
         if template_type == 'docker':
-            return creator(components, port_config=port_config)
+            return creator(components, project_name=project_name, port_config=port_config)
         return creator()

@@ -33,13 +33,7 @@ class FastAPIService(DockerService):
             'ports': ['8000'],
             'environment': environment,
             'volumes': ['./backend:/app'],
-            'networks': ['app-network'],
-            'labels': [
-                "traefik.enable=true",
-                "traefik.http.routers.backend.rule=Host(`api.localhost`)",
-                "traefik.http.routers.backend.entrypoints=web",
-                "traefik.http.services.backend.loadbalancer.server.port=8000"
-            ]
+            'networks': ['app-network']
         }
 
         if depends_on:

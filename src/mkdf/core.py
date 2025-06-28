@@ -60,8 +60,8 @@ def create_from_template(project_name, template_type, components=None, base_path
     project_path = os.path.join(base_path, project_name)
     try:
         if template_type == 'docker':
-            from .templates.docker_templates import get_docker_template
-            template = get_docker_template(components, project_name, port_config)
+            from .templates.factories.docker_factory import DockerComposeFactory
+            template = DockerComposeFactory.create(components, project_name, port_config)
         else:
             template = factory.create_template(template_type, components)
 
@@ -70,4 +70,4 @@ def create_from_template(project_name, template_type, components=None, base_path
     except ValueError as e:
         show_error(f"Error creating project: {e}", "Please check the template type and components.")
     except Exception as e:
-        show_error(f"An unexpected error occurred: {e}", "Please try again or consult the documentation.")
+        show_error(f"An unexpected error occurred: {str(e)}", "Please try again or consult the documentation.")

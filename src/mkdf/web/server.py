@@ -9,7 +9,7 @@ from ..fs.file_creator import create_file
 from ..fs.brace_expansion import brace_expand
 from ..fs.path_analyzer import is_file_path
 from ..templates.template_factory import TemplateFactory
-from mkdf.templates.docker_templates import DOCKER_COMPONENT_CATEGORIES
+from mkdf.templates.factories.env_factory import EnvFactory
 
 from ..config.config_manager import ConfigManager
 
@@ -18,7 +18,7 @@ config_manager = ConfigManager()
 
 @app.route('/api/docker_components')
 def get_docker_components():
-    return jsonify(DOCKER_COMPONENT_CATEGORIES)
+    return jsonify(EnvFactory.DOCKER_COMPONENT_CATEGORIES)
 
 def find_free_port(start_port=9500, max_attempts=100):
     """Find the first available port starting from start_port"""

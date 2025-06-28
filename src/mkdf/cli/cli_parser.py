@@ -10,7 +10,7 @@ from ..core import create_from_template, create_from_pattern
 from ..web.server import run_server
 from .interactive import start_interactive_mode, show_docker_components_table
 from ..templates.template_factory import TEMPLATE_CATEGORIES
-from ..templates.docker_templates import DOCKER_COMPONENT_CATEGORIES
+from ..templates.factories.env_factory import EnvFactory
 
 app = typer.Typer(
     name="mkdf",
@@ -162,7 +162,7 @@ def guided_docker_combo(project_name: str, project_path: str, overwrite: bool = 
     components = components_input.split()
 
     # Validate components
-    all_docker_components = [component for components_list in DOCKER_COMPONENT_CATEGORIES.values() for component in components_list]
+    all_docker_components = [component for components_list in EnvFactory.DOCKER_COMPONENT_CATEGORIES.values() for component in components_list]
     valid_components = [c for c in components if c in all_docker_components]
     if len(valid_components) != len(components):
         invalid = set(components) - set(all_docker_components)
