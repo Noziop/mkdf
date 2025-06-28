@@ -178,12 +178,14 @@ def show_templates_table():
 
     # Create rows by filling each category column
     max_items = max(len(templates) for templates in TEMPLATE_CATEGORIES.values())
-
+    
+    global_template_id = 1
     for i in range(max_items):
         row = []
         for category, templates in TEMPLATE_CATEGORIES.items():
             if i < len(templates):
-                row.append(templates[i])
+                row.append(f"{global_template_id}. {templates[i]}")
+                global_template_id += 1
             else:
                 row.append("")
         table.add_row(*row)
@@ -244,10 +246,21 @@ def interactive_create_from_template(banner_callback=None):
             port_config = None
             if template_type == 'docker':
                 print("Available Docker Components:")
-                for comp_name in EnvFactory.DOCKER_COMPONENT_CATEGORIES.keys():
-                    print(f"- {comp_name}")
-                components_input = input("Enter Docker components (e.g., fastapi vue monitoring), separated by space: ")
-                components = components_input.split()
+                show_docker_components_table() # Call the new numbered display
+                components_input = input("Enter Docker components (e.g., 1 8 14), separated by space or comma: ")
+                components = []
+                component_map = create_component_mapping()
+                for item in components_input.replace(' ', ',').split(','):
+                    item = item.strip()
+                    if item in component_map:
+                        components.append(component_map[item])
+                    elif item.isdigit() and int(item) in range(1, len(component_map) + 1):
+                        components.append(component_map[str(item)])
+                
+                if not components:
+                    print("No valid Docker components selected. Please try again.")
+                    continue
+
                 port_config = get_interactive_port_config()
 
             full_project_path = get_project_path(project_name)
@@ -275,6 +288,215 @@ def interactive_create_from_template(banner_callback=None):
                 print(f"An unexpected error occurred: {e}")
         else:
             print("Invalid template selection. Please try again.")
+
+def start_interactive_mode(banner_callback=None):
+    """
+    Starts the MKDF interactive command-line interface.
+    
+    This function presents the main menu for the interactive mode and 
+    handles navigation between different functionality options.
+    """
+    while True:
+        clear_screen()
+        if banner_callback:
+            banner_callback()
+        print("=== MKDF Interactive Mode ===")
+        print("Choose an option:")
+        print("1. Create from pattern (brace expansion)")
+        print("2. Create from template")
+        print("3. Create Docker combo")
+        print("4. Configure settings")
+        print("5. Exit")
+
+        choice = input("Your choice: ")
+
+        if choice == '1':
+            interactive_create_from_pattern()
+        elif choice == '2':
+            interactive_create_from_template(banner_callback)
+        elif choice == '3':
+            interactive_create_docker_combo(banner_callback)
+        elif choice == '4':
+            interactive_configure_settings(banner_callback)
+        elif choice == '5':
+            print("Exiting MKDF Interactive Mode. Goodbye!")
+            break
+
+def interactive_configure_settings(banner_callback=None):
+    clear_screen()
+    if banner_callback:
+        banner_callback()
+
+    print("\n=== ⚙️ Configuration Settings ===")
+    print("1. Default project path")
+    print("2. Default ports (backend/frontend)")  
+    print("3. Preferred templates")
+    print("0. Return to main menu")
+
+    # Basic implementation for now
+    choice = input("\nYour choice: ").strip()
+    if choice == "0":
+        return
+    else:
+        print("Configuration coming soon!")
+        input("Press Enter to continue...")
+
+def get_port_configuration():
+    """Interactive port configuration"""
+    print("=== Port Configuration ===")
+    print("Press Enter to use default ports, or specify custom ports:")
+
+    backend_port = input("Backend port [8000]: ").strip() or "8000"
+    frontend_port = input("Frontend port [3000]: ").strip() or "3000"
+    subnet = input("Docker subnet [172.18.0.0/16]: ").strip() or "172.18.0.0/16"
+
+    return {
+        'backend': int(backend_port),
+        'frontend': int(frontend_port),
+        'subnet': subnet,
+        'database': 5432,  # Default, will be auto-detected later
+        'redis': 6379,
+        'prometheus': 9090,
+        'grafana': 3001,
+        'traefik': 80,
+        'traefik_dashboard': 8080,
+    }
+
+def show_docker_components_table():
+    console = Console()
+    table = Table(title=" Docker Components", show_header=True, header_style="bold magenta")
+
+    # Add columns for each category
+    table.add_column("Backend", justify="center", style="white", width=10)
+    table.add_column("Frontend", justify="center", style="white", width=10)
+    table.add_column("Fullstack", justify="center", style="white", width=10)
+    table.add_column("Database", justify="center", style="white", width=10)
+    table.add_column("Cache/Queue", justify="center", style="white", width=12)
+    table.add_column("Proxy", justify="center", style="white", width=8)
+    table.add_column("Monitoring", justify="center", style="white", width=12)
+
+    # Create rows by filling each category column
+    max_items = max(len(components) for components in EnvFactory.DOCKER_COMPONENT_CATEGORIES.values())
+
+    global_component_id = 1
+    for i in range(max_items):
+        row = []
+        for category, components in EnvFactory.DOCKER_COMPONENT_CATEGORIES.items():
+            if i < len(components):
+                row.append(f"{global_component_id}. {components[i]}")
+                global_component_id += 1
+            else:
+                row.append("")
+        table.add_row(*row)
+
+    console.print(table)
+
+def create_component_mapping():
+    """Create mapping for sequential numbers and component names"""
+    components_flat = []
+    for category, components in EnvFactory.DOCKER_COMPONENT_CATEGORIES.items():
+        components_flat.extend(components)
+
+    component_map = {}
+    for i, component in enumerate(components_flat, 1):
+        component_map[str(i)] = component
+        component_map[component] = component  # Allow name selection
+
+    return component_map
+
+def interactive_create_docker_combo(banner_callback=None):
+    clear_screen()
+    if banner_callback:
+        banner_callback()
+    
+    print("\n===  Docker Combo Creator ===")
+
+    while True:
+        show_docker_components_table()
+        component_map = create_component_mapping()
+        
+        print("\n Selection Options:")
+        print("-  By numbers: 1,5,13 (sequential IDs)")
+        print("-  By names: fastapi,vue,postgresql")
+        print("-  Mixed: 1,vue,redis")
+        print("\n0. Return to main menu")
+        
+        choice = input("\nYour choice: ").strip()
+        
+        if choice == '0':
+            return
+        
+        # Parse selection
+        selected_components = []
+        for item in choice.replace(' ', ',').split(','):
+            item = item.strip()
+            if item in component_map:
+                selected_components.append(component_map[item])
+            elif item.isdigit() and int(item) in range(1, len(component_map) + 1):
+                selected_components.append(component_map[str(item)])
+        
+        if not selected_components:
+            print("No valid components selected. Try again.")
+            continue
+            
+        print(f"Selected components: {selected_components}")
+        
+        project_name = input("Enter project name: ").strip()
+        if not project_name:
+            print("Project name cannot be empty.")
+            continue
+
+        port_config = get_port_configuration()
+            
+        full_path = get_project_path(project_name)
+        
+        confirm = input(f"Create Docker project '{project_name}' with {selected_components} at {full_path}? (y/n): ")
+        if confirm.lower() == 'y':
+            try:
+                from ..core import create_from_template
+                create_from_template(project_name, 'docker', selected_components, base_path=str(full_path), port_config=port_config)
+                print(f"Successfully created Docker project '{project_name}'!")
+                print("✨ Project created successfully! ✨")
+                print(" You can now navigate to the project directory to start coding!")
+                print("⏳ Returning to main menu in 7 seconds...")
+                time.sleep(7)
+                return
+            except Exception as e:
+                print(f"Error creating project: {e}")
+        else:
+            print("Creation cancelled.")
+            continue
+
+def create_project_structure(structure, base_path):
+    """
+    Creates the project file and directory structure based on a template dictionary.
+    
+    Args:
+        structure (dict): Dictionary representing the directory structure and file contents
+                          where keys are names and values are either dicts (for directories) 
+                          or strings (for file contents)
+        base_path (str): The root directory path where the project structure will be created
+    """
+    from ..fs.dir_creator import create_directory
+    from ..fs.file_creator import create_file
+    
+    def create_recursive(items, current_path):
+        for name, content in items.items():
+            item_path = os.path.join(current_path, name)
+            
+            if isinstance(content, dict):
+                # C'est un répertoire
+                create_directory(item_path)
+                create_recursive(content, item_path)
+            else:
+                # C'est un fichier
+                create_file(item_path, content)
+    
+    # Créer le répertoire racine
+    create_directory(base_path)
+    # Créer la structure récursivement
+    create_recursive(structure, base_path)
+
 
 def start_interactive_mode(banner_callback=None):
     """
