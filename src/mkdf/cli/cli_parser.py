@@ -69,10 +69,8 @@ def show_templates_table():
     TEMPLATE_CATEGORIES = {
         "Backend API": ["fastapi", "flask", "express", "gofiber"],
         "Frontend": ["vue", "react", "svelte", "angular", "nextjs", "nuxtjs"],
-        "Fullstack": ["laravel", "django", "symfony"],
+        "Fullstack": ["laravel", "django"],
         "Static": ["simple", "static"],
-        "Mobile": ["react-native", "flutter"],
-        "Desktop": ["electron", "tauri"]
     }
 
     table = Table(title=" Available Templates", show_header=True, header_style="bold magenta")
@@ -99,15 +97,40 @@ def show_templates_table():
 
     console.print(table)
 
-def _create_from_template_wrapper(project_name: str, template_type: str, components: Optional[List[str]] = None, port_config: Optional[dict] = None, project_path: str = "."):
-    """Wrapper to call create_from_template with collected arguments."""
-    create_from_template(project_name, template_type, components, base_path=project_path, port_config=port_config)
+def _create_from_template_wrapper(project_name: str, template_type: str, components: Optional[List[str]] = None, port_config: Optional[dict] = None, project_path: str = ".", overwrite: bool = False):
+    create_from_template(project_name, template_type, components, base_path=project_path, port_config=port_config, overwrite=overwrite)
 
-def _create_docker_combo_wrapper(project_name: str, components: List[str], port_config: Optional[dict] = None, project_path: str = "."):
-    """Wrapper to call create_from_template for Docker combos."""
-    _create_from_template_wrapper(project_name, 'docker', components, port_config, project_path=project_path)
+def _create_docker_combo_wrapper(project_name: str, components: List[str], port_config: Optional[dict] = None, project_path: str = ".", overwrite: bool = False):
+    _create_from_template_wrapper(project_name, 'docker', components, port_config, project_path=project_path, overwrite=overwrite)
 
-def guided_template_selection(project_name: str, project_path: str):
+def print_success_confirmation(project_name: str, project_path: str, template_type: str):
+    """Print a friendly success message after project creation"""
+    from rich.console import Console
+    from rich.panel import Panel
+
+    console = Console()
+
+    # Success message with emoji
+    success_text = f" You're all set! Better get yourself coding this brilliant idea of yours!\n\n"
+    success_text += f" Project '{project_name}' created successfully!"
+    success_text += f"\n Location: {project_path}"
+
+    # Next steps based on template type
+    if template_type == 'django':
+        next_steps = "Next steps:\n  cd " + project_path + "\n  pip install -r requirements.txt\n  python manage.py runserver"
+    elif template_type == 'vue':
+        next_steps = "Next steps:\n  cd " + project_path + "\n  npm install\n  npm run dev"
+    elif template_type == 'fastapi':
+        next_steps = "Next steps:\n  cd " + project_path + "\n  pip install -r requirements.txt\n  python main.py"
+    else:
+        next_steps = "Next steps:\n  cd " + project_path + "\n  Start coding! "
+
+    # Print with Rich panel
+    panel_content = success_text + "\n\n" + next_steps
+    panel = Panel(panel_content, title="✨ Project Created Successfully", border_style="green")
+    console.print(panel)
+
+def guided_template_selection(project_name: str, project_path: str, overwrite: bool = False):
     """Guide user through template selection with Rich table"""
     print()
     show_templates_table() # Use Rich table instead of plain list
@@ -123,9 +146,14 @@ def guided_template_selection(project_name: str, project_path: str):
         typer.echo(f"Invalid choice: {choice}")
         return
 
-    _create_from_template_wrapper(project_name, selected_template, project_path=project_path)
+    _create_from_template_wrapper(project_name, selected_template, project_path=project_path, overwrite=overwrite)
 
-def guided_docker_combo(project_name: str, project_path: str):
+    # ADD success confirmation
+    full_path = os.path.join(project_path, project_name)
+    print_success_confirmation(project_name, full_path, selected_template)
+
+
+def guided_docker_combo(project_name: str, project_path: str, overwrite: bool = False):
     """Guide user through Docker combo creation"""
     print()
     show_docker_components_table()
@@ -156,9 +184,13 @@ def guided_docker_combo(project_name: str, project_path: str):
         port_config['traefik_dashboard'] = typer.prompt("Traefik dashboard port", default=8080, type=int)
 
 
-    _create_docker_combo_wrapper(project_name, valid_components, port_config, project_path=project_path)
+    _create_docker_combo_wrapper(project_name, valid_components, port_config, project_path=project_path, overwrite=overwrite)
 
-def guided_create_mode(project_name: Optional[str] = None):
+    # ADD success confirmation
+    full_path = os.path.join(project_path, project_name)
+    print_success_confirmation(project_name, full_path, 'docker')
+
+def guided_create_mode(project_name: Optional[str] = None, project_path: Optional[str] = None):
     """Guided project creation with simple prompts"""
     clear_screen()
     print(" MKDF Guided Project Creator")
@@ -169,23 +201,38 @@ def guided_create_mode(project_name: Optional[str] = None):
         project_name = typer.prompt("Project name")
 
     # Step 2: Project path
-    default_path = str(Path.home() / "projects")
-    project_path_input = typer.prompt("Project path", default=default_path)
+    if not project_path:
+        default_path = str(Path.home() / "projects")
+        project_path_input = typer.prompt("Project path", default=default_path)
 
-    # Expand user tilde first, as os.path.isabs doesn't handle it.
-    expanded_path = os.path.expanduser(project_path_input)
+        # Expand user tilde first, as os.path.isabs doesn't handle it.
+        expanded_path = os.path.expanduser(project_path_input)
 
-    # If the path is absolute, use it. Otherwise, join with the default path.
-    if os.path.isabs(expanded_path):
-        final_path = expanded_path
-    else:
-        final_path = os.path.join(default_path, expanded_path)
+        # If the path is absolute, use it. Otherwise, join with the default path.
+        if os.path.isabs(expanded_path):
+            final_path = expanded_path
+        else:
+            final_path = os.path.join(default_path, expanded_path)
 
-    # Normalize to get a clean, absolute path
-    project_path = os.path.abspath(final_path)
-    typer.echo(f"Will create project at: {os.path.join(project_path, project_name)}")
+        # Normalize to get a clean, absolute path
+        project_path = os.path.abspath(final_path)
 
-    # Step 2: Template or Docker combo choice
+    full_project_path = os.path.join(project_path, project_name)
+    console.print(f"Will create project at: {full_project_path}", style="orange1")
+
+    # Overwrite confirmation for guided mode
+    overwrite = False
+    if Path(full_project_path).exists():
+        if typer.confirm(f"Directory '{full_project_path}' already exists. Overwrite?", default=False):
+            console.print(f"⚠️  This will permanently DELETE all files in '{full_project_path}'", style="red")
+            typer.confirm("Are you absolutely sure?", abort=True)
+            overwrite = True
+            console.print("✨ Proceeding with overwrite...", style="green")
+        else:
+            console.print("Project creation cancelled.", style="yellow")
+            raise typer.Exit()
+
+    # Step 3: Template or Docker combo choice
     mode = typer.prompt(
         "Template or Docker combo",
         type=click.Choice(['template', 'docker', 't', 'd']),
@@ -193,9 +240,9 @@ def guided_create_mode(project_name: Optional[str] = None):
     )
 
     if mode in ['docker', 'd']:
-        guided_docker_combo(project_name, project_path)
+        guided_docker_combo(project_name, project_path, overwrite=overwrite)
     else:
-        guided_template_selection(project_name, project_path)
+        guided_template_selection(project_name, project_path, overwrite=overwrite)
 
 def expert_create_mode(
     project_name: str,
@@ -211,9 +258,26 @@ def expert_create_mode(
     prometheus_port: int,
     grafana_port: int,
     traefik_port: int,
-    traefik_dashboard_port: int
+    traefik_dashboard_port: int,
+    project_path: str = ".", # Add project_path here
+    overwrite: bool = False # Add overwrite here
 ):
     """Expert mode for project creation."""
+    project_full_path = os.path.join(project_path, project_name)
+
+    # Overwrite logic for expert mode
+    if Path(project_full_path).exists() and not force:
+        if typer.confirm(f"Directory '{project_full_path}' already exists. Overwrite?", default=False):
+            console.print(f"⚠️  This will permanently DELETE all files in '{project_full_path}'", style="red")
+            typer.confirm("Are you absolutely sure?", abort=True)
+            overwrite = True
+            console.print("✨ Proceeding with overwrite...", style="green")
+        else:
+            console.print("Project creation cancelled.", style="yellow")
+            raise typer.Exit()
+    else:
+        overwrite = force
+
     port_config = {
         'backend': backend_port,
         'frontend': frontend_port,
@@ -226,9 +290,14 @@ def expert_create_mode(
         'traefik_dashboard': traefik_dashboard_port,
     }
     if template_or_combo == 'docker':
-        _create_docker_combo_wrapper(project_name, components, port_config)
+        _create_docker_combo_wrapper(project_name, components, port_config, project_path=project_path, overwrite=overwrite)
     else:
-        _create_from_template_wrapper(project_name, template_or_combo, components, port_config)
+        _create_from_template_wrapper(project_name, template_or_combo, components, port_config, project_path=project_path, overwrite=overwrite)
+
+    # Add success confirmation for expert mode as well
+    full_path = os.path.join(project_path, project_name)
+    template_type = 'docker' if template_or_combo == 'docker' else template_or_combo
+    print_success_confirmation(project_name, full_path, template_type)
 
 
 @app.command()
@@ -263,12 +332,24 @@ def create(
         mkdf create myapp simple              # Expert mode (direct creation)  
         mkdf create myapi docker fastapi vue  # Expert mode (Docker combo)
     """
-    # Guided mode if no project name provided
+    # Guided mode if no arguments provided
     if project_name is None:
         return guided_create_mode()
 
+    # Determine project_path for expert mode
+    # If project_path is not provided as an argument, use the default behavior
+    # For expert mode, we assume the current directory unless specified otherwise.
+    # The `project_path` argument is not directly exposed in `create` command, but handled internally.
+    # For simplicity, in expert mode, we'll assume current working directory if not explicitly handled by guided_create_mode.
+    # The `project_path` parameter in `expert_create_mode` will default to "." if not passed.
+
+    # Handle overwrite logic for expert mode
+    overwrite = force # If --force is used, set overwrite to True
+
     # If partial arguments -> Continue guided mode with prefilled values
     if template_or_combo is None:
+        # If we are transitioning to guided mode, we need to pass the project_name
+        # and potentially the overwrite flag if it was set by --force
         return guided_create_mode(project_name=project_name)
 
     # If all arguments -> Expert mode (existing functionality)
@@ -286,7 +367,8 @@ def create(
         prometheus_port,
         grafana_port,
         traefik_port,
-        traefik_dashboard_port
+        traefik_dashboard_port,
+        overwrite=overwrite # Pass the overwrite flag to expert_create_mode
     )
 
 

@@ -175,8 +175,6 @@ def show_templates_table():
     table.add_column("Frontend SPA", justify="center", style="white", width=12)
     table.add_column("Fullstack", justify="center", style="white", width=10)
     table.add_column("Static", justify="center", style="white", width=8)
-    table.add_column("Mobile", justify="center", style="white", width=10)
-    table.add_column("Desktop", justify="center", style="white", width=10)
 
     # Create rows by filling each category column
     max_items = max(len(templates) for templates in TEMPLATE_CATEGORIES.values())

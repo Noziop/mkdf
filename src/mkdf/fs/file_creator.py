@@ -1,14 +1,24 @@
 from pathlib import Path
+from .fs_utils import _to_pathlib_path
+from .dir_creator import create_directory
 
-def create_file(path, content='', force=False):
-    """Creates a file, with template handling and force option."""
-    path = Path(path)
-    if path.exists() and not force:
-        print(f"File already exists: {path}")
-        return
+def create_file(path: str | Path, content: str = '', overwrite: bool = True):
+    """Creates a file.
+
+    Args:
+        path: The path to the file to create.
+        content: The content to write to the file.
+        overwrite: If True, overwrite existing file. If False and file exists, raises FileExistsError.
+
+    Raises:
+        FileExistsError: If the file already exists and overwrite is False.
+        IOError: For other input/output related errors during file creation.
+    """
+    path_obj = _to_pathlib_path(str(path))
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content)
-        print(f"Created file: {path}")
+        if path_obj.exists() and not overwrite:
+            raise FileExistsError(f"File already exists: {path_obj}")
+        path_obj.parent.mkdir(parents=True, exist_ok=True) # Ensure parent directory exists, don't fail if it exists
+        path_obj.write_text(content)
     except IOError as e:
-        print(f"Error creating file {path}: {e}")
+        raise IOError(f"Error creating file {path_obj}: {e}") from e

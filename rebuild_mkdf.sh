@@ -64,10 +64,13 @@ if ! pip install "$WHEEL_FILE"; then
     exit 1
 fi
 
+# Add ~/.local/bin to PATH for the quick test
+export PATH="$HOME/.local/bin:$PATH"
+
 # Étape 5: Test rapide
 echo
 log_info "Step 5: Quick test..."
-if mkdf create --help > /dev/null 2>&1; then
+if python3 -m mkdf.main create --help > /dev/null 2>&1; then
     log_info "MKDF successfully installed and working!"
     echo
     echo "🎉 Ready to test your changes!"

@@ -52,6 +52,11 @@ man.txt
 test_projects/
 generated_*/
 
+# Test directories (should be in temp, not current dir)
+web_*_test/
+*_test/
+test_*/
+
 # === Editors ===
 .vscode/
 .idea/

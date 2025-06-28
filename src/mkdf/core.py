@@ -9,7 +9,7 @@ from .utils import show_error, create_with_progress # Import for error and progr
 
 config_manager = ConfigManager()
 
-def create_from_pattern(pattern: str):
+def create_from_pattern(pattern: str, overwrite: bool = False):
     """
     Creates a project structure from a brace expansion pattern.
     """
@@ -18,28 +18,30 @@ def create_from_pattern(pattern: str):
         with create_with_progress("Creating project structure...") as progress:
             for path in expanded_paths:
                 if is_file_path(path):
-                    create_file(path)
+                    create_file(path, content="", overwrite=overwrite)
                 else:
-                    create_directory(path)
+                    create_directory(path, overwrite=overwrite)
             progress.update(description="✅ Project created successfully!")
+    except FileExistsError as e:
+        show_error(f"Failed to create from pattern: {e}", "A file or directory already exists. Use --force to overwrite.")
     except Exception as e:
         show_error(f"Failed to create from pattern: {e}", "Please check your pattern syntax.")
 
-def _create_from_template_recursive(base_path, template_dict):
+def _create_from_template_recursive(base_path, template_dict, overwrite: bool = False):
     """
     Recursively creates directories and files from a template dictionary.
     """
     for name, content in template_dict.items():
         current_path = os.path.join(base_path, name)
         if isinstance(content, dict):
-            create_directory(current_path)
-            _create_from_template_recursive(current_path, content)
+            create_directory(current_path, overwrite=overwrite)
+            _create_from_template_recursive(current_path, content, overwrite=overwrite)
         elif content is None:
-            create_directory(current_path)
+            create_directory(current_path, overwrite=overwrite)
         else:
-            create_file(current_path, str(content))
+            create_file(current_path, str(content), overwrite=overwrite)
 
-def create_from_template(project_name, template_type, components=None, base_path=".", port_config=None):
+def create_from_template(project_name, template_type, components=None, base_path=".", port_config=None, overwrite: bool = False):
     """Create project from template with optional port configuration"""
     if port_config is None:
         port_config = {
@@ -63,9 +65,8 @@ def create_from_template(project_name, template_type, components=None, base_path
         else:
             template = factory.create_template(template_type, components)
 
-        create_directory(project_path)
-        _create_from_template_recursive(project_path, template)
-        print(f"Successfully created project '{project_name}' from template '{template_type}'.")
+        create_directory(project_path, overwrite=overwrite)
+        _create_from_template_recursive(project_path, template, overwrite=overwrite)
     except ValueError as e:
         show_error(f"Error creating project: {e}", "Please check the template type and components.")
     except Exception as e:

@@ -1,10 +1,6 @@
 import os
 from pathlib import Path
 
-def expand_tilde(path):
-    """Expands the tilde (~) in a path to the user's home directory."""
-    return Path(path).expanduser()
-
 def is_file_path(path: str) -> bool:
     """
     Correctly detect if path is a file:
@@ -29,11 +25,3 @@ def is_dir_path(path: str) -> bool:
     - Has extension -> False
     """
     return not is_file_path(path)
-
-def validate_path(path):
-    """Validates if a path is a valid file system path."""
-    try:
-        Path(path)
-        return True
-    except (TypeError, ValueError):
-        return False

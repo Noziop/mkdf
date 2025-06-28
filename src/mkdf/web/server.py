@@ -9,7 +9,8 @@ from ..fs.file_creator import create_file
 from ..fs.brace_expansion import brace_expand
 from ..fs.path_analyzer import is_file_path
 from ..templates.template_factory import TemplateFactory
-from ..templates.docker_templates import DOCKER_MODULES
+from mkdf.templates.docker_templates import DOCKER_COMPONENT_CATEGORIES
+
 from ..config.config_manager import ConfigManager
 
 app = Flask(__name__, template_folder='templates')
@@ -17,7 +18,7 @@ config_manager = ConfigManager()
 
 @app.route('/api/docker_components')
 def get_docker_components():
-    return jsonify(list(DOCKER_MODULES.keys()))
+    return jsonify(DOCKER_COMPONENT_CATEGORIES)
 
 def find_free_port(start_port=9500, max_attempts=100):
     """Find the first available port starting from start_port"""
@@ -30,19 +31,7 @@ def find_free_port(start_port=9500, max_attempts=100):
             continue
     raise RuntimeError(f"No free port found in range {start_port}-{start_port + max_attempts}")
 
-def _create_from_template_recursive(base_path, template_dict):
-    """
-    Recursively creates directories and files from a template dictionary.
-    """
-    for name, content in template_dict.items():
-        current_path = os.path.join(base_path, name)
-        if isinstance(content, dict):
-            create_directory(current_path)
-            _create_from_template_recursive(current_path, content)
-        elif content is None:
-            create_directory(current_path)
-        else:
-            create_file(current_path, str(content))
+
 
 def _generate_tree_string(expanded_paths):
     """
@@ -109,17 +98,16 @@ def create_pattern_web():
     except Exception as e:
         return jsonify({"message": f"Error creating project: {e}", "success": False})
 
+from ..core import create_from_template
+
 @app.route('/create_template', methods=['POST'])
 def create_template_web():
     data = request.get_json()
     project_name = data.get('project_name', '')
     template_type = data.get('template_type', '')
 
-    factory = TemplateFactory()
     try:
-        template = factory.create_template(template_type)
-        create_directory(project_name)
-        _create_from_template_recursive(project_name, template)
+        create_from_template(project_name, template_type, overwrite=True)
         return jsonify({"message": f"Successfully created project '{project_name}' from template '{template_type}'.", "success": True})
     except ValueError as e:
         return jsonify({"message": f"Error: {e}", "success": False})
@@ -144,11 +132,8 @@ def create_docker_web():
     project_name = data.get('project_name', '')
     components = data.get('components', [])
 
-    factory = TemplateFactory()
     try:
-        template = factory.create_template('docker', components)
-        create_directory(project_name)
-        _create_from_template_recursive(project_name, template)
+        create_from_template(project_name, 'docker', components, overwrite=True)
         return jsonify({"message": f"Successfully created Docker project '{project_name}' with components {components}.", "success": True})
     except ValueError as e:
         return jsonify({"message": f"Error: {e}", "success": False})
