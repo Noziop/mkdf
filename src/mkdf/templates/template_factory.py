@@ -5,11 +5,9 @@ from .factories.docker_factory import DockerComposeFactory, PortConfig, ProjectS
 
 TEMPLATE_CATEGORIES = {
 "Backend API": ["fastapi", "flask", "express", "gofiber"],
-"Frontend SPA": ["vue", "react", "svelte", "angular", "nextjs", "nuxtjs"],
-"Fullstack": ["laravel", "django", "symfony"],
-"Static": ["simple", "static"],
-"Mobile": ["react-native", "flutter"],
-"Desktop": ["electron", "tauri"]
+"Frontend SPA": ["vue", "react", "svelte", "angular", "nuxtjs"],
+"Fullstack": ["laravel", "django", "symfony", "nextjs"],
+"Static Site": ["simple", "static"]
 }
 
 class TemplateFactory:

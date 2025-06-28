@@ -65,13 +65,7 @@ def show_templates_table():
     """Display available templates in a beautiful Rich table"""
     console = Console()
 
-    # Template categories (matching existing structure)
-    TEMPLATE_CATEGORIES = {
-        "Backend API": ["fastapi", "flask", "express", "gofiber"],
-        "Frontend": ["vue", "react", "svelte", "angular", "nextjs", "nuxtjs"],
-        "Fullstack": ["laravel", "django"],
-        "Static": ["simple", "static"],
-    }
+    # TEMPLATE_CATEGORIES is imported from ..templates.template_factory
 
     table = Table(title=" Available Templates", show_header=True, header_style="bold magenta")
 
