@@ -282,32 +282,242 @@ def set_web_server_port():
     else:
         print("Port not changed.")
 
+from ...templates.template_factory import TEMPLATE_CATEGORIES
+from ...templates.factories.env_factory import EnvFactory
+
 def set_preferred_templates():
-    current_backend = config_manager.get("preferred_templates", {}).get("backend", "N/A")
-    current_frontend = config_manager.get("preferred_templates", {}).get("frontend", "N/A")
-    current_fullstack = config_manager.get("preferred_templates", {}).get("fullstack", "N/A")
-
+    os.system('cls' if os.name == 'nt' else 'clear')
     print("\n=== Set Preferred Templates ===")
+    show_templates_table()
+    template_map = create_template_mapping()
+
+    current_backend = config_manager.get("preferred_templates", {}).get("backend", "N/A")
     print(f"Current Backend: {current_backend}")
-    new_backend = input("Enter preferred backend template (e.g., fastapi, flask): ").strip()
-    if new_backend:
-        config_manager.config["preferred_templates"]["backend"] = new_backend
-        config_manager.set("preferred_templates", config_manager.config["preferred_templates"])
-        print(f"Preferred backend set to: {new_backend}")
+    backend_choice = input("Enter preferred backend template (name or number, leave empty to keep current): ").strip()
+    if backend_choice:
+        selected_backend = template_map.get(backend_choice)
+        if selected_backend and selected_backend in TEMPLATE_CATEGORIES.get("Backend API", []):
+            config_manager.config["preferred_templates"]["backend"] = selected_backend
+            config_manager.set("preferred_templates", config_manager.config["preferred_templates"])
+            print(f"Preferred backend set to: {selected_backend}")
+        else:
+            print("Invalid backend template. Keeping current.")
 
+    current_frontend = config_manager.get("preferred_templates", {}).get("frontend", "N/A")
     print(f"Current Frontend: {current_frontend}")
-    new_frontend = input("Enter preferred frontend template (e.g., vue, react): ").strip()
-    if new_frontend:
-        config_manager.config["preferred_templates"]["frontend"] = new_frontend
-        config_manager.set("preferred_templates", config_manager.config["preferred_templates"])
-        print(f"Preferred frontend set to: {new_frontend}")
+    frontend_choice = input("Enter preferred frontend template (name or number, leave empty to keep current): ").strip()
+    if frontend_choice:
+        selected_frontend = template_map.get(frontend_choice)
+        if selected_frontend and selected_frontend in TEMPLATE_CATEGORIES.get("Frontend SPA", []):
+            config_manager.config["preferred_templates"]["frontend"] = selected_frontend
+            config_manager.set("preferred_templates", config_manager.config["preferred_templates"])
+            print(f"Preferred frontend set to: {selected_frontend}")
+        else:
+            print("Invalid frontend template. Keeping current.")
 
+    current_fullstack = config_manager.get("preferred_templates", {}).get("fullstack", "N/A")
     print(f"Current Fullstack: {current_fullstack}")
-    new_fullstack = input("Enter preferred fullstack template (e.g., laravel, nextjs): ").strip()
-    if new_fullstack:
-        config_manager.config["preferred_templates"]["fullstack"] = new_fullstack
-        config_manager.set("preferred_templates", config_manager.config["preferred_templates"])
-        print(f"Preferred fullstack set to: {new_fullstack}")
+    fullstack_choice = input("Enter preferred fullstack template (name or number, leave empty to keep current): ").strip()
+    if fullstack_choice:
+        selected_fullstack = template_map.get(fullstack_choice)
+        if selected_fullstack and selected_fullstack in TEMPLATE_CATEGORIES.get("Fullstack", []):
+            config_manager.config["preferred_templates"]["fullstack"] = selected_fullstack
+            config_manager.set("preferred_templates", config_manager.config["preferred_templates"])
+            print(f"Preferred fullstack set to: {selected_fullstack}")
+        else:
+            print("Invalid fullstack template. Keeping current.")
+
+def set_preferred_docker_combo():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\n=== Set Preferred Docker Combo ===")
+    show_docker_components_table()
+    component_map = create_component_mapping()
+
+    current_combo = config_manager.get("preferred_docker_combo", "N/A")
+    print(f"Current Preferred Docker Combo: {current_combo}")
+
+    components_input = input("Enter Docker components (space-separated names or numbers, leave empty to keep current): ").strip()
+    if components_input:
+        selected_components = []
+        for item in components_input.replace(' ', ',').split(','):
+            item = item.strip()
+            if item in component_map:
+                selected_components.append(component_map[item])
+            elif item.isdigit() and int(item) in range(1, len(component_map) + 1):
+                selected_components.append(component_map[str(item)])
+        
+        if selected_components:
+            config_manager.set("preferred_docker_combo", " ".join(selected_components))
+            print(f"Preferred Docker combo set to: {' '.join(selected_components)}")
+        else:
+            print("No valid components selected. Keeping current combo.")
+    else:
+        print("Docker combo not changed.")
+
+def interactive_configure_settings(banner_callback=None):
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        if banner_callback:
+            banner_callback()
+
+        print("\n=== ⚙️ Configuration Settings ===")
+        print("1. View current configuration")
+        print("2. Set Default project path")
+        print("3. Set Web server port")
+        print("4. Set Preferred templates")
+        print("5. Set Preferred Docker combo")
+        print("6. Set Author name/email")
+        print("7. Toggle Debug mode")
+        print("8. Template directory paths (read-only)")
+        print("9. Export configuration")
+        print("10. Import configuration")
+        print("0. Return to main menu")
+
+        choice = input("\nYour choice: ").strip()
+
+        if choice == "1":
+            view_current_configuration()
+        elif choice == "2":
+            set_default_project_path()
+        elif choice == "3":
+            set_web_server_port()
+        elif choice == "4":
+            set_preferred_templates()
+        elif choice == "5":
+            set_preferred_docker_combo()
+        elif choice == "6":
+            set_author_info()
+        elif choice == "7":
+            toggle_debug_mode()
+        elif choice == "8":
+            view_template_directory_paths()
+        elif choice == "9":
+            export_configuration()
+        elif choice == "10":
+            import_configuration()
+        elif choice == "0":
+            return
+        else:
+            print("Invalid choice. Please try again.")
+        input("Press Enter to continue...")
+
+def view_current_configuration():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\n=== Current Configuration ===")
+    for key, value in config_manager.config.items():
+        print(f"{key}: {value}")
+
+def set_default_project_path():
+    current_path = config_manager.get("default_project_path")
+    new_path = input(f"Enter new default project path (current: {current_path}): ").strip()
+    if new_path:
+        try:
+            Path(new_path).mkdir(parents=True, exist_ok=True)
+            config_manager.set("default_project_path", new_path)
+            print(f"Default project path set to: {new_path}")
+        except Exception as e:
+            print(f"Error setting path: {e}")
+    else:
+        print("Path not changed.")
+
+def set_web_server_port():
+    current_port = config_manager.get("web_port_start")
+    new_port_str = input(f"Enter new web server port (current: {current_port}): ").strip()
+    if new_port_str:
+        try:
+            new_port = int(new_port_str)
+            if 1024 <= new_port <= 65535:
+                config_manager.set("web_port_start", new_port)
+                print(f"Web server port set to: {new_port}")
+            else:
+                print("Invalid port number. Must be between 1024 and 65535.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+    else:
+        print("Port not changed.")
+
+def set_author_info():
+    current_name = config_manager.get("author_name")
+    current_email = config_manager.get("author_email")
+
+    new_name = input(f"Enter author name (current: {current_name}): ").strip()
+    if new_name:
+        config_manager.set("author_name", new_name)
+        print(f"Author name set to: {new_name}")
+
+    new_email = input(f"Enter author email (current: {current_email}): ").strip()
+    if new_email:
+        config_manager.set("author_email", new_email)
+        print(f"Author email set to: {new_email}")
+
+def toggle_debug_mode():
+    current_logging_enabled = config_manager.get("enable_logging")
+    current_log_level = config_manager.get("log_level")
+
+    print(f"Current logging enabled: {current_logging_enabled}")
+    print(f"Current log level: {current_log_level}")
+
+    toggle_choice = input("Toggle logging (y/n, current: {})".format('y' if current_logging_enabled else 'n')).strip().lower()
+    if toggle_choice == 'y':
+        config_manager.set("enable_logging", True)
+        print("Logging enabled.")
+    elif toggle_choice == 'n':
+        config_manager.set("enable_logging", False)
+        print("Logging disabled.")
+    else:
+        print("No change to logging status.")
+
+    if config_manager.get("enable_logging"):
+        new_log_level = input(f"Set log level (INFO, DEBUG, WARNING, ERROR, CRITICAL, current: {current_log_level}): ").strip().upper()
+        if new_log_level in ["INFO", "DEBUG", "WARNING", "ERROR", "CRITICAL"]:
+            config_manager.set("log_level", new_log_level)
+            print(f"Log level set to: {new_log_level}")
+        else:
+            print("Invalid log level. No change.")
+
+def view_template_directory_paths():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("\n=== Template Directory Paths ===")
+    print(f"Templates Directory: {config_manager.get('templates_dir')}")
+    print("\nNote: This setting is read-only and cannot be changed directly from here.")
+
+def export_configuration():
+    export_path_str = input(f"Enter path to export configuration (default: {CONFIG_FILE}.bak): ").strip()
+    if not export_path_str:
+        export_path = Path(str(CONFIG_FILE) + ".bak")
+    else:
+        export_path = Path(export_path_str)
+
+    try:
+        with open(export_path, 'w') as f:
+            json.dump(config_manager.config, f, indent=4)
+        print(f"Configuration exported to: {export_path}")
+    except Exception as e:
+        print(f"Error exporting configuration: {e}")
+
+def import_configuration():
+    import_path_str = input("Enter path to import configuration from: ").strip()
+    if not import_path_str:
+        print("No path entered. Import cancelled.")
+        return
+
+    import_path = Path(import_path_str)
+    if not import_path.exists():
+        print("File not found.")
+        return
+
+    try:
+        with open(import_path, 'r') as f:
+            imported_config = json.load(f)
+        
+        # Validate imported config structure if necessary
+        config_manager.config.update(imported_config)
+        config_manager._save_user_config() # Force save the updated config
+        print(f"Configuration imported from: {import_path}")
+    except json.JSONDecodeError:
+        print("Invalid JSON file.")
+    except Exception as e:
+        print(f"Error importing configuration: {e}")
 
 def set_author_info():
     current_name = config_manager.get("author_name")
