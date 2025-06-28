@@ -24,7 +24,14 @@ class ConfigManager:
             "templates_dir": str(CONFIG_DIR / "templates"),
             "web_port_start": 9500,
             "enable_logging": True,
-            "log_level": "INFO"
+            "log_level": "INFO",
+            "author_name": "Your Name",
+            "author_email": "your.email@example.com",
+            "preferred_templates": {
+                "backend": "fastapi",
+                "frontend": "vue",
+                "fullstack": "nextjs"
+            }
         }
 
     def _load_user_config(self) -> Dict[str, Any]:
