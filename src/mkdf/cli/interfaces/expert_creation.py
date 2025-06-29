@@ -23,6 +23,7 @@ def expert_create_mode(
     grafana_port: int,
     traefik_port: int,
     traefik_dashboard_port: int,
+    traefik_https_port: int,
     project_path: str = ".",
     overwrite: bool = False
 ):
@@ -54,8 +55,9 @@ def expert_create_mode(
         'subnet': subnet,
         'prometheus': prometheus_port,
         'grafana': grafana_port,
-        'traefik': traefik_port,
-        'traefik_dashboard': traefik_dashboard_port,
+        'traefik_port': traefik_port,
+        'traefik_dashboard_port': traefik_dashboard_port,
+        'traefik_https_port': traefik_https_port,
     }
     if template_or_combo == 'docker':
         success = create_from_template(project_name, 'docker', components, base_path=project_path, port_config=port_config, overwrite=overwrite)

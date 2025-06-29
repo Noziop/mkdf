@@ -22,15 +22,16 @@ def create(
         False, "--force", "-f", help="Force overwrite existing files"
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
-    backend_port: int = typer.Option(8000, "--backend-port", help="Backend service port"),
-    frontend_port: int = typer.Option(3000, "--frontend-port", help="Frontend service port"),
+    backend_port: int = typer.Option(None, "--backend-port", help="Backend service port"),
+    frontend_port: int = typer.Option(None, "--frontend-port", help="Frontend service port"),
     db_port: int = typer.Option(None, "--db-port", help="Database port (auto-detect if not specified)"),
-    redis_port: int = typer.Option(6379, "--redis-port", help="Redis port"),
+    redis_port: int = typer.Option(None, "--redis-port", help="Redis port"),
     subnet: str = typer.Option(None, "--subnet", help="Docker network subnet"),
-    prometheus_port: int = typer.Option(9090, "--prometheus-port", help="Prometheus port"),
-    grafana_port: int = typer.Option(3001, "--grafana-port", help="Grafana port"),
-    traefik_port: int = typer.Option(80, "--traefik-port", help="Traefik HTTP port"),
-    traefik_dashboard_port: int = typer.Option(8080, "--traefik-dashboard-port", help="Traefik dashboard port")
+    prometheus_port: int = typer.Option(None, "--prometheus-port", help="Prometheus port"),
+    grafana_port: int = typer.Option(None, "--grafana-port", help="Grafana port"),
+    traefik_port: int = typer.Option(None, "--traefik-port", help="Traefik HTTP port"),
+    traefik_https_port: int = typer.Option(None, "--traefik-https-port", help="Traefik HTTPS port"),
+    traefik_dashboard_port: int = typer.Option(None, "--traefik-dashboard-port", help="Traefik dashboard port")
 ):
     """
     Create a new project from template or Docker combo.
@@ -54,6 +55,7 @@ def create(
         prometheus_port,
         grafana_port,
         traefik_port,
+        traefik_https_port,
         traefik_dashboard_port
     )
 

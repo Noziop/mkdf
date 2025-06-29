@@ -47,17 +47,10 @@ def mock_all_dependencies(mocker, tmp_path):
     mocker.patch('src.mkdf.cli.models.mappings.create_component_mapping', return_value={'1': 'fastapi', 'fastapi': 'fastapi', '2': 'vue', 'vue': 'vue', '3': 'postgresql', 'postgresql': 'postgresql'})
 
     mocker.patch('src.mkdf.utils.find_free_subnet', return_value='172.25.0.0/16')
+    mocker.patch('src.mkdf.utils.find_free_port', side_effect=lambda x: x + 1000) # Mock find_free_port to return a predictable value
 
     # Mock get_interactive_port_config to return a default dictionary
-    mocker.patch('src.mkdf.cli.models.ports.get_interactive_port_config', return_value={
-        'backend': 8000,
-        'frontend': 3000,
-        'subnet': None,
-        'prometheus': 9090,
-        'grafana': 3001,
-        'traefik': 80,
-        'traefik_dashboard': 8080,
-    })
+    mocker.patch('src.mkdf.cli.models.ports.get_interactive_port_config', return_value={})
 
     # Patch the functions that perform the actual creation logic within the CLI commands
     mock_expert_create_mode = mocker.patch('src.mkdf.cli.interfaces.expert_creation.expert_create_mode')
@@ -83,7 +76,7 @@ def test_template_creation_workflow(mock_all_dependencies, mocker):
     result = runner.invoke(app, ["create", "myproject", "react"])
     assert result.exit_code == 0
     mock_expert_create_mode.assert_called_once_with(
-        "myproject", "react", None, force=False, verbose=False, backend_port=8000, frontend_port=3000, db_port=None, redis_port=6379, subnet="172.25.0.0/16", prometheus_port=9090, grafana_port=3001, traefik_port=80, traefik_dashboard_port=8080, project_path=".", overwrite=False
+        "myproject", "react", None, force=False, verbose=False, backend_port=8000 + 1000, frontend_port=3000 + 1000, db_port=None, redis_port=6379 + 1000, subnet="172.25.0.0/16", prometheus_port=9090 + 1000, grafana_port=3001 + 1000, traefik_port=80 + 1000, traefik_dashboard_port=8080 + 1000, 443 + 1000, project_path=".", overwrite=False
     )
 
 def test_docker_combo_workflow(mock_all_dependencies, mocker):
@@ -92,7 +85,7 @@ def test_docker_combo_workflow(mock_all_dependencies, mocker):
     result = runner.invoke(app, ["create", "myproject", "docker", "fastapi", "vue", "postgresql"])
     assert result.exit_code == 0
     mock_expert_create_mode.assert_called_once_with(
-        "myproject", "docker", ["fastapi", "vue", "postgresql"], force=False, verbose=False, backend_port=8000, frontend_port=3000, db_port=None, redis_port=6379, subnet="172.25.0.0/16", prometheus_port=9090, grafana_port=3001, traefik_port=80, traefik_dashboard_port=8080, project_path=".", overwrite=False
+        "myproject", "docker", ["fastapi", "vue", "postgresql"], force=False, verbose=False, backend_port=8000 + 1000, frontend_port=3000 + 1000, db_port=None, redis_port=6379 + 1000, subnet="172.25.0.0/16", prometheus_port=9090 + 1000, grafana_port=3001 + 1000, traefik_port=80 + 1000, traefik_dashboard_port=8080 + 1000, 443 + 1000, project_path=".", overwrite=False
     )
 
 def test_guided_mode_workflow(mock_all_dependencies, mocker):

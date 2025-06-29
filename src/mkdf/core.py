@@ -44,17 +44,8 @@ def _create_from_template_recursive(base_path, template_dict, overwrite: bool = 
 def create_from_template(project_name, template_type, components=None, base_path=".", port_config=None, overwrite: bool = False):
     """Create project from template with optional port configuration"""
     if port_config is None:
-        port_config = {
-            'backend': 8000,
-            'frontend': 3000,
-            'database': None, # This will be auto-detected by get_docker_template
-            'redis': 6379,
-            'prometheus': 9090,
-            'grafana': 3001,
-            'traefik': 80,
-            'traefik_dashboard': 8080,
-        }
-    if 'subnet' not in port_config or port_config['subnet'] is None:
+        port_config = {}
+    if 'subnet' not in port_config or port_config.get('subnet') is None:
         from .utils import find_free_subnet
         port_config['subnet'] = find_free_subnet()
 

@@ -35,32 +35,24 @@ class DockerComposeFactory:
         if port_config is None:
             port_config = {}
 
-        # Default port mappings
-        default_ports = {
-            'fastapi': 8000, 'flask': 5000, 'django': 8000, 'express': 3000,
-            'vue': 3000, 'react': 3000, 'angular': 4200, 'svelte': 5173,
-            'postgresql': 5432, 'mysql': 3306, 'mariadb': 3306, 'mongodb': 27017,
-            'redis': 6379, 'prometheus': 9090, 'grafana': 3001, 'traefik': 80, 'traefik_dashboard': 8080
-        }
-
         # Identify backend, frontend, and database for port configuration
         backend_type = next((c for c in components if c in ['fastapi', 'flask', 'django', 'express']), None)
         frontend_type = next((c for c in components if c in ['vue', 'react', 'angular', 'svelte']), None)
         db_config = detect_database_service(components)
-        database_type = db_config['service_name'] if db_config else {} #None
+        database_type = db_config['service_name'] if db_config else None
 
         # Build port_config with defaults
         final_port_config = {
-            'backend': port_config.get('backend', find_free_port(default_ports.get(backend_type, 8000))),
-            'frontend': port_config.get('frontend', find_free_port(default_ports.get(frontend_type, 3000))),
-            'database': port_config.get('database', find_free_port(default_ports.get(database_type, 5432) if database_type else 5432)),
-            'redis': port_config.get('redis', find_free_port(default_ports.get('redis', 6379))),
-            'traefik': port_config.get('traefik', find_free_port(default_ports.get('traefik', 80))),
-            'traefik_dashboard': port_config.get('traefik_dashboard', find_free_port(default_ports.get('traefik_dashboard', 8080))),
-            'subnet': port_config.get('subnet', find_free_subnet()),
-            'prometheus': port_config.get('prometheus', find_free_port(default_ports.get('prometheus', 9090))),
-            'grafana': port_config.get('grafana', find_free_port(default_ports.get('grafana', 3001))),
-            'traefik_https_port': port_config.get('traefik_https_port', find_free_port(443))
+            'backend': port_config.get('backend'),
+            'frontend': port_config.get('frontend'),
+            'database': port_config.get('database'),
+            'redis': port_config.get('redis'),
+            'traefik_port': port_config.get('traefik_port'),
+            'traefik_https_port': port_config.get('traefik_https_port'),
+            'traefik_dashboard_port': port_config.get('traefik_dashboard_port'),
+            'subnet': port_config.get('subnet'),
+            'prometheus': port_config.get('prometheus'),
+            'grafana': port_config.get('grafana')
         }
 
         project_structure = {}
@@ -102,16 +94,16 @@ class DockerComposeFactory:
 
             if component in ['fastapi', 'flask', 'django', 'express']:
                 port_key = 'backend'
-                internal_port = default_ports.get(component, 8000)
+                internal_port = 8000
             elif component in ['vue', 'react', 'angular', 'svelte']:
                 port_key = 'frontend'
-                internal_port = default_ports.get(component, 3000)
+                internal_port = 3000
             elif component in ['postgresql', 'mysql', 'mariadb', 'mongodb']:
                 port_key = 'database'
-                internal_port = default_ports.get(component, 5432)
+                internal_port = 5432
             elif component == 'redis':
                 port_key = 'redis'
-                internal_port = default_ports.get(component, 6379)
+                internal_port = 6379
             
             if port_key:
                 external_port = final_port_config.get(port_key)
@@ -123,12 +115,10 @@ class DockerComposeFactory:
                     service_config['ports'] = [f"{internal_port}:{internal_port}"]
 
             elif component == 'traefik':
-                traefik_port = final_port_config.get('traefik')
-                traefik_dashboard_port = final_port_config.get('traefik_dashboard')
                 service_config['ports'] = [
-                    f"{traefik_port}:80",
-                    f"{final_port_config.get('traefik_https_port')}:443", # Assuming 443 is always internal for Traefik
-                    f"{traefik_dashboard_port}:8080" # Traefik dashboard
+                    f"{final_port_config.get('traefik_port')}:80",
+                    f"{final_port_config.get('traefik_https_port')}:443",
+                    f"{final_port_config.get('traefik_dashboard_port')}:8080"
                 ]
 
             # Inject Traefik labels conditionally

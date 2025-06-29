@@ -2,7 +2,7 @@ from typing import Optional, List
 from ..interfaces.guided_creation import guided_create_mode
 from ..interfaces.expert_creation import expert_create_mode
 from ...config.config_manager import ConfigManager
-from ...utils import find_free_subnet
+from ...utils import find_free_subnet, find_free_port
 
 config_manager = ConfigManager()
 
@@ -21,9 +21,40 @@ def create_command(
     grafana_port: int,
     traefik_port: int,
     traefik_dashboard_port: int,
+    traefik_https_port: int,
 ):
     if subnet is None:
         subnet = find_free_subnet()
+
+    # Define default port values for various services
+    default_port_values = {
+        'backend': 8000,
+        'frontend': 3000,
+        'redis': 6379,
+        'prometheus': 9090,
+        'grafana': 3001,
+        'traefik': 8080,
+        'traefik_dashboard': 8090,
+        'traefik_https': 8085
+    }
+
+    # Assign free ports if not explicitly provided by the user
+    if backend_port is None:
+        backend_port = find_free_port(default_port_values['backend'])
+    if frontend_port is None:
+        frontend_port = find_free_port(default_port_values['frontend'])
+    if redis_port is None:
+        redis_port = find_free_port(default_port_values['redis'])
+    if prometheus_port is None:
+        prometheus_port = find_free_port(default_port_values['prometheus'])
+    if grafana_port is None:
+        grafana_port = find_free_port(default_port_values['grafana'])
+    if traefik_port is None:
+        traefik_port = find_free_port(default_port_values['traefik'])
+    if traefik_dashboard_port is None:
+        traefik_dashboard_port = find_free_port(default_port_values['traefik_dashboard'])
+    if traefik_https_port is None:
+        traefik_https_port = find_free_port(default_port_values['traefik_https'])
 
     if project_name is None:
         return guided_create_mode()
@@ -80,5 +111,6 @@ def create_command(
         grafana_port,
         traefik_port,
         traefik_dashboard_port,
+        traefik_https_port,
         overwrite=force
     )

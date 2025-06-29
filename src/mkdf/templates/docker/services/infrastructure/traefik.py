@@ -14,7 +14,6 @@ class TraefikService(DockerService):
                 '--api.dashboard=true',
                 '--api.insecure=true'
             ],
-            'ports': ['80:80', '443:443', '8080:8080'],
             'volumes': [
                 '/var/run/docker.sock:/var/run/docker.sock:ro',
                 './traefik/traefik.yml:/traefik.yml:ro'

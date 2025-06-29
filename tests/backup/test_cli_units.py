@@ -19,6 +19,7 @@ def mock_all_cli_dependencies(mocker, tmp_path):
     mocker.patch('typer.confirm', return_value=True)
     mocker.patch('os.system') # Mock os.system('clear')
     mocker.patch('src.mkdf.utils.find_free_subnet', return_value='172.25.0.0/16')
+    mocker.patch('src.mkdf.utils.find_free_port', side_effect=lambda x: x + 1000) # Mock find_free_port to return a predictable value
 
 def test_create_command_function_guided_mode(mock_all_cli_dependencies, mocker):
     mock_guided_create_mode = mocker.patch('src.mkdf.cli.interfaces.guided_creation.guided_create_mode')
@@ -28,15 +29,16 @@ def test_create_command_function_guided_mode(mock_all_cli_dependencies, mocker):
         components=None,
         force=False,
         verbose=False,
-        backend_port=8000,
-        frontend_port=3000,
+        backend_port=None,
+        frontend_port=None,
         db_port=None,
-        redis_port=6379,
+        redis_port=None,
         subnet=None,
-        prometheus_port=9090,
-        grafana_port=3001,
-        traefik_port=80,
-        traefik_dashboard_port=8080,
+        prometheus_port=None,
+        grafana_port=None,
+        traefik_port=None,
+        traefik_dashboard_port=None,
+        traefik_https_port=None,
     )
     mock_guided_create_mode.assert_called_once_with()
 
@@ -48,18 +50,19 @@ def test_create_command_function_expert_mode_template(mock_all_cli_dependencies,
         components=None,
         force=False,
         verbose=False,
-        backend_port=8000,
-        frontend_port=3000,
+        backend_port=None,
+        frontend_port=None,
         db_port=None,
-        redis_port=6379,
+        redis_port=None,
         subnet=None,
-        prometheus_port=9090,
-        grafana_port=3001,
-        traefik_port=80,
-        traefik_dashboard_port=8080,
+        prometheus_port=None,
+        grafana_port=None,
+        traefik_port=None,
+        traefik_dashboard_port=None,
+        traefik_https_port=None,
     )
     mock_expert_create_mode.assert_called_once_with(
-        "myproject", "react", None, False, False, 8000, 3000, None, 6379, "172.25.0.0/16", 9090, 3001, 80, 8080, overwrite=False
+        "myproject", "react", None, False, False, 8000 + 1000, 3000 + 1000, None, 6379 + 1000, "172.25.0.0/16", 9090 + 1000, 3001 + 1000, 8080 + 1000, 8090 + 1000, 8085 + 1000, overwrite=False
     )
 
 def test_create_command_function_expert_mode_docker(mock_all_cli_dependencies, mocker):
@@ -79,9 +82,10 @@ def test_create_command_function_expert_mode_docker(mock_all_cli_dependencies, m
         grafana_port=3002,
         traefik_port=81,
         traefik_dashboard_port=8081,
+        traefik_https_port=8086,
     )
     mock_expert_create_mode.assert_called_once_with(
-        "myproject", "docker", ["fastapi", "vue"], True, True, 8080, 3001, 5433, 6380, "172.19.0.0/16", 9091, 3002, 81, 8081, overwrite=True
+        "myproject", "docker", ["fastapi", "vue"], True, True, 8080, 3001, 5433, 6380, "172.19.0.0/16", 9091, 3002, 81, 8081, 8086, overwrite=True
     )
 
 def test_template_mapping_functions():
