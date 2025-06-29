@@ -49,7 +49,7 @@ def find_free_port(start_port=1025, max_attempts=500):
 def find_free_subnet(start_octet=18, max_attempts=100):
     """Find an available /16 subnet in the 172.x.0.0 range for Docker networks."""
     existing_subnets = set()
-    print(f"🔍 DEBUG: Starting to find free subnet, checking existing Docker networks...")
+    
     try:
         result = subprocess.run(
             ["docker", "network", "ls", "-q"],

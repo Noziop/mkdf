@@ -28,7 +28,6 @@ class DockerComposeFactory:
         port_config: Optional[PortConfig] = None
     ) -> ProjectStructure:
         """Generate Docker template with configurable ports and subnet."""
-        print(f"DEBUG: components at start of create: {components}")
         if components is None:
             components = []
         if project_name is None:
@@ -48,9 +47,6 @@ class DockerComposeFactory:
         backend_type = next((c for c in components if c in ['fastapi', 'flask', 'django', 'express']), None)
         frontend_type = next((c for c in components if c in ['vue', 'react', 'angular', 'svelte']), None)
         db_config = detect_database_service(components)
-        if db_config:
-            print(f"🔍 DEBUG: db_config['env_vars'] = {db_config.get('env_vars')}")
-            print(f"🔍 DEBUG: type(db_config['env_vars']) = {type(db_config.get('env_vars'))}")
         database_type = db_config['service_name'] if db_config else {} #None
 
         # Build port_config with defaults
@@ -66,7 +62,6 @@ class DockerComposeFactory:
             'grafana': port_config.get('grafana', find_free_port(default_ports.get('grafana', 3001))),
             'traefik_https_port': port_config.get('traefik_https_port', find_free_port(443))
         }
-        print(f"DEBUG: Subnet after find_free_subnet: {final_port_config.get('subnet')}")
 
         project_structure = {}
         docker_compose_services = {}
@@ -87,7 +82,6 @@ class DockerComposeFactory:
         # .env file generation
         env_vars = [f'PROJECT_NAME={project_name}']
         if db_config and 'env_vars' in db_config:
-            print(f"🔍 DEBUG: About to extend with: {db_config['env_vars']}")
             env_vars.extend(db_config['env_vars'])
         
         if backend_type:
@@ -100,11 +94,7 @@ class DockerComposeFactory:
             service = get_service(component)
             if service is None:
                 raise ValueError(f"Service not found for component: {component}")
-            print(f"🔍 DEBUG boucle comp in comp: service for {component} type: {type(service)}")
-            print(f"DEBUG: service for {component}: {service}")
             service_config = service.get_service_config(components)
-            print(f"🔍 service_config type: {type(service_config)}, value: {service_config}")
-            print(f"DEBUG: service_config for {component}: {service_config}")
 
             # Apply port configuration
             port_key = None
@@ -125,7 +115,7 @@ class DockerComposeFactory:
             
             if port_key:
                 external_port = final_port_config.get(port_key)
-                print(f"DEBUG: port_key: {port_key}, external_port: {external_port}, internal_port: {internal_port}, type: {type(external_port), type(internal_port), type(port_key)}")
+                
                 if external_port is not None:
                     service_config['ports'] = [f"{external_port}:{internal_port}"]
                 else:
@@ -143,8 +133,8 @@ class DockerComposeFactory:
 
             # Inject Traefik labels conditionally
             if 'traefik' in components:
-                print(f"DEBUG: Adding Traefik labels for component: {component}")
-                print(f"DEBUG: port_key: {port_key}, internal_port: {internal_port}")
+                
+                
                 labels_to_add = []
                 if port_key == 'backend' and internal_port:
                     labels_to_add.extend([
@@ -180,7 +170,7 @@ class DockerComposeFactory:
 
             component_path = service_config.get('build', {}).get('context', f'./{component}').lstrip('./')
             files = service.get_files(components)
-            print(f"🔍 files type: {type(files)}, value: {files}")
+            
             
             for file_path, content in files.items():
                 full_path = Path(component_path) / file_path

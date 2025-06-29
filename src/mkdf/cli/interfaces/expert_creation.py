@@ -26,15 +26,9 @@ def expert_create_mode(
     project_path: str = ".",
     overwrite: bool = False
 ):
-    print(f"🔍 DEBUG expert_create_mode ENTRY")
-    print(f"🔍 project_name: {project_name}")
-    print(f"🔍 template_or_combo: {template_or_combo}")
-    print(f"🔍 components: {components}")
-    print(f"🔍 components type: {type(components)}")
-    
     # Si components est None :
     if components is None:
-        print("🚨 COMPONENTS IS NONE in expert_create_mode!")
+        
         return
 
     """Expert mode for project creation."""
