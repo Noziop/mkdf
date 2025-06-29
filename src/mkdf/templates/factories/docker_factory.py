@@ -181,7 +181,7 @@ class DockerComposeFactory:
             component_path = service_config.get('build', {}).get('context', f'./{component}').lstrip('./')
             files = service.get_files(components)
             print(f"🔍 files type: {type(files)}, value: {files}")
-            print(f"DEBUG: files for {component}: {files}")
+            
             for file_path, content in files.items():
                 full_path = Path(component_path) / file_path
                 current_dict = project_structure

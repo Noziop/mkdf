@@ -12,7 +12,7 @@ SERVICE_REGISTRY = {
 
 def get_service(service_name: str):
     service_class = SERVICE_REGISTRY.get(service_name)
-    print(f"DEBUG: In get_service, service_name: {service_name}, service_class: {service_class}")
+    
     if not service_class:
         raise ValueError(f"Unknown service: {service_name}")
     return service_class()
