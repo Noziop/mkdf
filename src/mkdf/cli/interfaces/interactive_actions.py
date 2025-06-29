@@ -114,12 +114,13 @@ def interactive_create_from_template(banner_callback=None):
 
                 port_config = get_interactive_port_config()
 
-            full_project_path = get_project_path(project_name)
+            project_path = get_project_path()
+            full_project_path = os.path.join(project_path, project_name)
 
             try:
                 confirm = input(f"Create project '{project_name}' using template '{template_type}' at {full_project_path}? (y/n): ").lower()
                 if confirm == 'y':
-                    create_from_template(project_name, template_type, components, base_path=str(full_project_path), port_config=port_config)
+                    create_from_template(project_name, template_type, components, base_path=project_path, port_config=port_config)
                     print("\n✨ Project created successfully! ✨")
                     print(" You can now navigate to the project directory to start coding!")
                     print("\n⏳ Returning to main menu in 7 seconds...")
@@ -180,12 +181,13 @@ def interactive_create_docker_combo(banner_callback=None):
 
         port_config = get_interactive_port_config()
             
-        full_path = get_project_path(project_name)
+        project_path = get_project_path()
+        full_path = os.path.join(project_path, project_name)
         
         confirm = input(f"Create Docker project '{project_name}' with {selected_components} at {full_path}? (y/n): ")
         if confirm.lower() == 'y':
             try:
-                create_from_template(project_name, 'docker', selected_components, base_path=str(full_path), port_config=port_config)
+                create_from_template(project_name, 'docker', selected_components, base_path=project_path, port_config=port_config)
                 print(f"Successfully created Docker project '{project_name}'!")
                 print("✨ Project created successfully! ✨")
                 print(" You can now navigate to the project directory to start coding!")
