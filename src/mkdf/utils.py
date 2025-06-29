@@ -67,7 +67,7 @@ def find_free_subnet(start_octet=18, max_attempts=100):
             networks_data = json.loads(inspect_result.stdout)
             if networks_data is None:
                 networks_data = []
-            print(f"🔍 DEBUG: Found {len(networks_data)} existing Docker networks.")
+            
             
             for network in networks_data:
                 if 'IPAM' in network and 'Config' in network['IPAM'] and network['IPAM']['Config'] is not None:
