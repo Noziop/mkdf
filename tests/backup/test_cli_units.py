@@ -2,10 +2,10 @@ import pytest
 from unittest.mock import MagicMock, patch
 import typer
 
-from src.mkdf.cli.commands.create import create_command
-from src.mkdf.cli.models.mappings import create_template_mapping, create_component_mapping
-from src.mkdf.cli.validators.path import get_project_path
-from src.mkdf.cli.interfaces.guided_creation import guided_template_selection, guided_docker_combo, guided_create_mode
+from mkdf.cli.commands.create import create_command
+from mkdf.cli.models.mappings import create_template_mapping, create_component_mapping
+from mkdf.cli.validators.path import get_project_path
+from mkdf.cli.interfaces.guided_creation import guided_template_selection, guided_docker_combo, guided_create_mode
 
 @pytest.fixture
 def mock_all_cli_dependencies(mocker, tmp_path):

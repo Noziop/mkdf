@@ -63,11 +63,14 @@ def create_from_template(project_name, template_type, components=None, base_path
             from .templates.factories.docker_factory import DockerComposeFactory
             template = DockerComposeFactory.create(components, project_name, port_config)
         else:
-            template = factory.create_template(template_type, components)
+            template = factory.create_template(template_type, components, project_name=project_name)
 
         create_directory(project_path, overwrite=overwrite)
         _create_from_template_recursive(project_path, template, overwrite=overwrite)
     except ValueError as e:
         show_error(f"Error creating project: {e}", "Please check the template type and components.")
+        return False
     except Exception as e:
         show_error(f"An unexpected error occurred: {str(e)}", "Please try again or consult the documentation.")
+        return False
+    return True

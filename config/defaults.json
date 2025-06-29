@@ -1,3 +1,4 @@
 {
-    "default_template": "simple"
+    "default_template": "simple",
+    "preferred_docker_combo": "fastapi react"
 }

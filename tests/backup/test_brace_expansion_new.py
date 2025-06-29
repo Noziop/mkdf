@@ -1,5 +1,5 @@
 import unittest
-from src.mkdf.fs.brace_expansion import brace_expand
+from mkdf.fs.brace_expansion import brace_expand
 
 class TestBraceExpansion(unittest.TestCase):
 

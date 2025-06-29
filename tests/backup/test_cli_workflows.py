@@ -6,13 +6,13 @@ from pathlib import Path
 import shutil
 import typer
 
-from src.mkdf.cli.parsers.main_parser import app
-from src.mkdf.core import create_from_template, create_from_pattern
-from src.mkdf.cli.interfaces.guided_creation import guided_create_mode
-from src.mkdf.cli.interfaces.interactive_actions import interactive_create_from_template, interactive_create_docker_combo, interactive_create_from_pattern
-from src.mkdf.cli.commands.create import create_command
-from src.mkdf.cli.commands.pattern import pattern_command
-from src.mkdf.cli.commands.interactive import interactive_command
+from mkdf.cli.parsers.main_parser import app
+from mkdf.core import create_from_template, create_from_pattern
+from mkdf.cli.interfaces.guided_creation import guided_create_mode
+from mkdf.cli.interfaces.interactive_actions import interactive_create_from_template, interactive_create_docker_combo, interactive_create_from_pattern
+from mkdf.cli.commands.create import create_command
+from mkdf.cli.commands.pattern import pattern_command
+from mkdf.cli.commands.interactive import interactive_command
 
 runner = CliRunner()
 

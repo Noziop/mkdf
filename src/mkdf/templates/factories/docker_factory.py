@@ -2,8 +2,12 @@ from typing import List, Dict, Any, Optional
 from pathlib import Path
 from ..docker.registry import get_service
 from ..docker.base.db_utils import detect_database_service
+from ...utils import find_free_port, find_free_subnet
+from ...config.config_manager import ConfigManager
+import ipaddress
+import socket
 
-ProjectStructure = Dict[str, Any]
+config_manager = ConfigManager()
 
 class PortConfig(dict):
     pass
@@ -14,6 +18,8 @@ class DockerfileFactory:
         service = get_service(component)
         return service.get_dockerfile_content()
 
+ProjectStructure = Dict[str, Any]
+
 class DockerComposeFactory:
     @staticmethod
     def create(
@@ -22,7 +28,7 @@ class DockerComposeFactory:
         port_config: Optional[PortConfig] = None
     ) -> ProjectStructure:
         """Generate Docker template with configurable ports and subnet."""
-        
+        print(f"DEBUG: components at start of create: {components}")
         if components is None:
             components = []
         if project_name is None:
@@ -35,27 +41,31 @@ class DockerComposeFactory:
             'fastapi': 8000, 'flask': 5000, 'django': 8000, 'express': 3000,
             'vue': 3000, 'react': 3000, 'angular': 4200, 'svelte': 5173,
             'postgresql': 5432, 'mysql': 3306, 'mariadb': 3306, 'mongodb': 27017,
-            'redis': 6379, 'prometheus': 9090, 'grafana': 3001, 'traefik': 80
+            'redis': 6379, 'prometheus': 9090, 'grafana': 3001, 'traefik': 80, 'traefik_dashboard': 8080
         }
 
         # Identify backend, frontend, and database for port configuration
         backend_type = next((c for c in components if c in ['fastapi', 'flask', 'django', 'express']), None)
         frontend_type = next((c for c in components if c in ['vue', 'react', 'angular', 'svelte']), None)
         db_config = detect_database_service(components)
-        database_type = db_config['service_name'] if db_config else None
+        if db_config:
+            print(f"🔍 DEBUG: db_config['env_vars'] = {db_config.get('env_vars')}")
+            print(f"🔍 DEBUG: type(db_config['env_vars']) = {type(db_config.get('env_vars'))}")
+        database_type = db_config['service_name'] if db_config else {} #None
 
         # Build port_config with defaults
         final_port_config = {
-            'backend': port_config.get('backend', default_ports.get(backend_type, 8000)),
-            'frontend': port_config.get('frontend', default_ports.get(frontend_type, 3000)),
-            'database': port_config.get('database', default_ports.get(database_type, 5432)),
-            'redis': port_config.get('redis', default_ports.get('redis', 6379)),
-            'subnet': port_config.get('subnet', '172.18.0.0/16'),
-            'prometheus': port_config.get('prometheus', default_ports.get('prometheus', 9090)),
-            'grafana': port_config.get('grafana', default_ports.get('grafana', 3001)),
-            'traefik': port_config.get('traefik', default_ports.get('traefik', 80)),
-            'traefik_dashboard': port_config.get('traefik_dashboard', 8080),
+            'backend': port_config.get('backend', find_free_port(default_ports.get(backend_type, 8000))),
+            'frontend': port_config.get('frontend', find_free_port(default_ports.get(frontend_type, 3000))),
+            'database': port_config.get('database', find_free_port(default_ports.get(database_type, 5432) if database_type else 5432)),
+            'redis': port_config.get('redis', find_free_port(default_ports.get('redis', 6379))),
+            'traefik': port_config.get('traefik', find_free_port(default_ports.get('traefik', 80))),
+            'subnet': port_config.get('subnet', find_free_subnet()),
+            'prometheus': port_config.get('prometheus', find_free_port(default_ports.get('prometheus', 9090))),
+            'grafana': port_config.get('grafana', find_free_port(default_ports.get('grafana', 3001))),
+            'subnet': port_config.get('subnet', find_free_subnet())
         }
+        print(f"DEBUG: Subnet after find_free_subnet: {final_port_config.get('subnet')}")
 
         project_structure = {}
         docker_compose_services = {}
@@ -67,7 +77,7 @@ class DockerComposeFactory:
                 'driver': 'bridge',
                 'ipam': {
                     'config': [{
-                        'subnet': final_port_config.get('subnet', '172.18.0.0/16')
+                        'subnet': final_port_config.get('subnet')
                     }]
                 }
             }
@@ -75,7 +85,8 @@ class DockerComposeFactory:
 
         # .env file generation
         env_vars = [f'PROJECT_NAME={project_name}']
-        if db_config:
+        if db_config and 'env_vars' in db_config:
+            print(f"🔍 DEBUG: About to extend with: {db_config['env_vars']}")
             env_vars.extend(db_config['env_vars'])
         
         if backend_type:
@@ -86,34 +97,51 @@ class DockerComposeFactory:
 
         for component in components:
             service = get_service(component)
+            if service is None:
+                raise ValueError(f"Service not found for component: {component}")
+            print(f"🔍 DEBUG boucle comp in comp: service for {component} type: {type(service)}")
+            print(f"DEBUG: service for {component}: {service}")
             service_config = service.get_service_config(components)
+            print(f"🔍 service_config type: {type(service_config)}, value: {service_config}")
+            print(f"DEBUG: service_config for {component}: {service_config}")
 
             # Apply port configuration
             port_key = None
             internal_port = None
+
             if component in ['fastapi', 'flask', 'django', 'express']:
                 port_key = 'backend'
+                internal_port = default_ports.get(component, 8000)
             elif component in ['vue', 'react', 'angular', 'svelte']:
                 port_key = 'frontend'
+                internal_port = default_ports.get(component, 3000)
             elif component in ['postgresql', 'mysql', 'mariadb', 'mongodb']:
                 port_key = 'database'
+                internal_port = default_ports.get(component, 5432)
             elif component == 'redis':
                 port_key = 'redis'
-            elif component == 'traefik':
-                traefik_port = final_port_config.get('traefik', 80)
-                traefik_dashboard = final_port_config.get('traefik_dashboard', 8080)
-                service_config['ports'] = [
-                    f"{traefik_port}:80",
-                    "443:443",
-                    f"{traefik_dashboard}:8080"
-                ]
+                internal_port = default_ports.get(component, 6379)
             
-            if port_key and 'ports' in service_config and service_config['ports']:
-                internal_port = service_config['ports'][0].split(':')[-1]
-                service_config['ports'] = [f"{final_port_config.get(port_key, internal_port)}:{internal_port}"]
+            if port_key:
+                external_port = final_port_config.get(port_key)
+                print(f"DEBUG: port_key: {port_key}, external_port: {external_port}, internal_port: {internal_port}, type: {type(external_port), type(internal_port), type(port_key)}")
+                if external_port is not None:
+                    service_config['ports'] = [f"{external_port}:{internal_port}"]
+                else:
+                    # Fallback to internal port if external is not found (shouldn't happen with find_free_port)
+                    service_config['ports'] = [f"{internal_port}:{internal_port}"]
+
+            elif component == 'traefik':
+                service_config['ports'] = [
+                    "80:80",
+                    "443:443",
+                    "8080:8080" # Traefik dashboard
+                ]
 
             # Inject Traefik labels conditionally
             if 'traefik' in components:
+                print(f"DEBUG: Adding Traefik labels for component: {component}")
+                print(f"DEBUG: port_key: {port_key}, internal_port: {internal_port}")
                 labels_to_add = []
                 if port_key == 'backend' and internal_port:
                     labels_to_add.extend([
@@ -149,6 +177,8 @@ class DockerComposeFactory:
 
             component_path = service_config.get('build', {}).get('context', f'./{component}').lstrip('./')
             files = service.get_files(components)
+            print(f"🔍 files type: {type(files)}, value: {files}")
+            print(f"DEBUG: files for {component}: {files}")
             for file_path, content in files.items():
                 full_path = Path(component_path) / file_path
                 current_dict = project_structure

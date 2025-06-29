@@ -26,6 +26,17 @@ def expert_create_mode(
     project_path: str = ".",
     overwrite: bool = False
 ):
+    print(f"🔍 DEBUG expert_create_mode ENTRY")
+    print(f"🔍 project_name: {project_name}")
+    print(f"🔍 template_or_combo: {template_or_combo}")
+    print(f"🔍 components: {components}")
+    print(f"🔍 components type: {type(components)}")
+    
+    # Si components est None :
+    if components is None:
+        print("🚨 COMPONENTS IS NONE in expert_create_mode!")
+        return
+
     """Expert mode for project creation."""
     project_full_path = os.path.join(project_path, project_name)
 
@@ -53,10 +64,11 @@ def expert_create_mode(
         'traefik_dashboard': traefik_dashboard_port,
     }
     if template_or_combo == 'docker':
-        create_from_template(project_name, 'docker', components, base_path=project_path, port_config=port_config, overwrite=overwrite)
+        success = create_from_template(project_name, 'docker', components, base_path=project_path, port_config=port_config, overwrite=overwrite)
     else:
-        create_from_template(project_name, template_or_combo, components, base_path=project_path, port_config=port_config, overwrite=overwrite)
+        success = create_from_template(project_name, template_or_combo, components, base_path=project_path, port_config=port_config, overwrite=overwrite)
 
-    full_path = os.path.join(project_path, project_name)
-    template_type = 'docker' if template_or_combo == 'docker' else template_or_combo
-    print_success_confirmation(project_name, full_path, template_type)
+    if success:
+        full_path = os.path.join(project_path, project_name)
+        template_type = 'docker' if template_or_combo == 'docker' else template_or_combo
+        print_success_confirmation(project_name, full_path, template_type)
