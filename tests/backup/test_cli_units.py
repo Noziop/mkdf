@@ -18,6 +18,7 @@ def mock_all_cli_dependencies(mocker, tmp_path):
     mocker.patch('src.mkdf.cli.models.ports.get_interactive_port_config', return_value={})
     mocker.patch('typer.confirm', return_value=True)
     mocker.patch('os.system') # Mock os.system('clear')
+    mocker.patch('src.mkdf.utils.find_free_subnet', return_value='172.25.0.0/16')
 
 def test_create_command_function_guided_mode(mock_all_cli_dependencies, mocker):
     mock_guided_create_mode = mocker.patch('src.mkdf.cli.interfaces.guided_creation.guided_create_mode')
@@ -31,7 +32,7 @@ def test_create_command_function_guided_mode(mock_all_cli_dependencies, mocker):
         frontend_port=3000,
         db_port=None,
         redis_port=6379,
-        subnet="172.18.0.0/16",
+        subnet=None,
         prometheus_port=9090,
         grafana_port=3001,
         traefik_port=80,
@@ -51,14 +52,14 @@ def test_create_command_function_expert_mode_template(mock_all_cli_dependencies,
         frontend_port=3000,
         db_port=None,
         redis_port=6379,
-        subnet="172.18.0.0/16",
+        subnet=None,
         prometheus_port=9090,
         grafana_port=3001,
         traefik_port=80,
         traefik_dashboard_port=8080,
     )
     mock_expert_create_mode.assert_called_once_with(
-        "myproject", "react", None, False, False, 8000, 3000, None, 6379, "172.18.0.0/16", 9090, 3001, 80, 8080, overwrite=False
+        "myproject", "react", None, False, False, 8000, 3000, None, 6379, "172.25.0.0/16", 9090, 3001, 80, 8080, overwrite=False
     )
 
 def test_create_command_function_expert_mode_docker(mock_all_cli_dependencies, mocker):

@@ -49,12 +49,14 @@ def create_from_template(project_name, template_type, components=None, base_path
             'frontend': 3000,
             'database': None, # This will be auto-detected by get_docker_template
             'redis': 6379,
-            'subnet': '172.18.0.0/16',
             'prometheus': 9090,
             'grafana': 3001,
             'traefik': 80,
             'traefik_dashboard': 8080,
         }
+    if 'subnet' not in port_config or port_config['subnet'] is None:
+        from .utils import find_free_subnet
+        port_config['subnet'] = find_free_subnet()
 
     factory = TemplateFactory()
     project_path = os.path.join(base_path, project_name)

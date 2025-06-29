@@ -26,7 +26,7 @@ def create(
     frontend_port: int = typer.Option(3000, "--frontend-port", help="Frontend service port"),
     db_port: int = typer.Option(None, "--db-port", help="Database port (auto-detect if not specified)"),
     redis_port: int = typer.Option(6379, "--redis-port", help="Redis port"),
-    subnet: str = typer.Option("172.18.0.0/16", "--subnet", help="Docker network subnet"),
+    subnet: str = typer.Option(None, "--subnet", help="Docker network subnet"),
     prometheus_port: int = typer.Option(9090, "--prometheus-port", help="Prometheus port"),
     grafana_port: int = typer.Option(3001, "--grafana-port", help="Grafana port"),
     traefik_port: int = typer.Option(80, "--traefik-port", help="Traefik HTTP port"),

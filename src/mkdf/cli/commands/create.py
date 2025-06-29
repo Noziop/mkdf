@@ -2,6 +2,7 @@ from typing import Optional, List
 from ..interfaces.guided_creation import guided_create_mode
 from ..interfaces.expert_creation import expert_create_mode
 from ...config.config_manager import ConfigManager
+from ...utils import find_free_subnet
 
 config_manager = ConfigManager()
 
@@ -21,6 +22,9 @@ def create_command(
     traefik_port: int,
     traefik_dashboard_port: int,
 ):
+    if subnet is None:
+        subnet = find_free_subnet()
+
     if project_name is None:
         return guided_create_mode()
 
