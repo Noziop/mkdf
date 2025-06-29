@@ -127,7 +127,7 @@ def test_guided_template_selection(mock_all_cli_dependencies, mocker):
 def test_guided_docker_combo(mock_all_cli_dependencies, mocker):
     mock_typer_prompt = mocker.patch('typer.prompt')
     mock_typer_prompt.side_effect = ["fastapi vue", "n"] # Components, then no custom ports
-    mock_create_from_template = mocker.patch('src.mkdf.core.create_from_template')
+    mock_create_from_template = mocker.patch('mkdf.core.create_from_template')
     
     guided_docker_combo("test_docker_project", "/tmp/test_path")
     
@@ -159,7 +159,7 @@ def test_guided_create_mode_docker_flow(mock_all_cli_dependencies, mocker):
         "fastapi vue",           # Components
         "n"                      # No custom ports
     ]
-    mock_guided_docker_combo = mocker.patch('src.mkdf.cli.interfaces.guided_creation.guided_docker_combo')
+    mock_guided_docker_combo = mocker.patch('mkdf.cli.interfaces.guided_creation.guided_docker_combo')
 
     guided_create_mode()
 

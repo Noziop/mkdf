@@ -1,5 +1,5 @@
 import unittest
-from src.mkdf.templates.factories.docker_factory import DockerComposeFactory
+from mkdf.templates.factories.docker_factory import DockerComposeFactory
 
 class TestDockerCombos(unittest.TestCase):
 

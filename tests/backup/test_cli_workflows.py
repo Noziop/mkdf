@@ -63,7 +63,7 @@ def mock_all_dependencies(mocker, tmp_path):
     mock_interactive_create_from_template = mocker.patch('src.mkdf.cli.interfaces.interactive_actions.interactive_create_from_template')
     mock_interactive_create_docker_combo = mocker.patch('src.mkdf.cli.interfaces.interactive_actions.interactive_create_docker_combo')
     mock_interactive_create_from_pattern = mocker.patch('src.mkdf.cli.interfaces.interactive_actions.interactive_create_from_pattern')
-    mock_pattern_command_create_from_pattern = mocker.patch('src.mkdf.core.create_from_pattern') # For direct pattern command
+    mock_pattern_command_create_from_pattern = mocker.patch('mkdf.core.create_from_pattern') # For direct pattern command
 
     return (
         mock_expert_create_mode,

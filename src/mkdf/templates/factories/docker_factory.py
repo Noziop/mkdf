@@ -60,10 +60,11 @@ class DockerComposeFactory:
             'database': port_config.get('database', find_free_port(default_ports.get(database_type, 5432) if database_type else 5432)),
             'redis': port_config.get('redis', find_free_port(default_ports.get('redis', 6379))),
             'traefik': port_config.get('traefik', find_free_port(default_ports.get('traefik', 80))),
+            'traefik_dashboard': port_config.get('traefik_dashboard', find_free_port(default_ports.get('traefik_dashboard', 8080))),
             'subnet': port_config.get('subnet', find_free_subnet()),
             'prometheus': port_config.get('prometheus', find_free_port(default_ports.get('prometheus', 9090))),
             'grafana': port_config.get('grafana', find_free_port(default_ports.get('grafana', 3001))),
-            'subnet': port_config.get('subnet', find_free_subnet())
+            'traefik_https_port': port_config.get('traefik_https_port', find_free_port(443))
         }
         print(f"DEBUG: Subnet after find_free_subnet: {final_port_config.get('subnet')}")
 
@@ -132,10 +133,12 @@ class DockerComposeFactory:
                     service_config['ports'] = [f"{internal_port}:{internal_port}"]
 
             elif component == 'traefik':
+                traefik_port = final_port_config.get('traefik')
+                traefik_dashboard_port = final_port_config.get('traefik_dashboard')
                 service_config['ports'] = [
-                    "80:80",
-                    "443:443",
-                    "8080:8080" # Traefik dashboard
+                    f"{traefik_port}:80",
+                    f"{final_port_config.get('traefik_https_port')}:443", # Assuming 443 is always internal for Traefik
+                    f"{traefik_dashboard_port}:8080" # Traefik dashboard
                 ]
 
             # Inject Traefik labels conditionally
