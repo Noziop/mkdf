@@ -26,6 +26,22 @@ log_error() {
     echo -e "${RED}❌ $1${NC}"
 }
 
+# Étape 0: Vérifier si le server web est en cours d'exécution
+echo
+log_info "Step 0: Checking if web server is running..."
+if mkdf web status > /dev/null 2>&1; then
+    log_info "Web server is running."
+    echo "Stopping the web server..."
+    if mkdf web stop; then
+        log_info "Web server stopped successfully."
+    else
+        log_error "Failed to stop the web server."
+        exit 1
+    fi
+else
+    log_warning "Web server is not running."
+fi
+
 # Étape 1: Désinstaller l'ancienne version
 echo
 log_info "Step 1: Uninstalling existing MKDF..."
@@ -77,6 +93,16 @@ if python3 -m mkdf.main create --help > /dev/null 2>&1; then
     echo "Try: mkdf create"
 else
     log_error "MKDF installation verification failed!"
+    exit 1
+fi
+
+# Étape 6: Relancer le serveur web
+echo
+log_info "Step 6: Restarting web server..."
+if mkdf web start; then
+    log_info "Web server started successfully."
+else
+    log_error "Failed to start the web server."
     exit 1
 fi
 

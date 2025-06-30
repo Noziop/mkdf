@@ -34,11 +34,6 @@ class ProjectHistory(SQLModel, table=True):
 # --- FastAPI App ---
 app = FastAPI()
 
-# --- Static Files ---
-STATIC_DIR = Path(__file__).parent / "static"
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="spa")
-
 
 # --- Dependency ---
 def get_db():
@@ -77,6 +72,18 @@ from ..fs.brace_expansion import brace_expand
 from ..fs.path_analyzer import is_file_path
 from ..fs.dir_creator import create_directory
 from ..fs.file_creator import create_file
+
+@app.get("/api/templates")
+async def get_templates():
+    """Get available templates from factories"""
+    try:
+        factory = TemplateFactory()
+        templates = factory.get_all_templates()
+        
+        return {json_key: templates[json_key] for json_key in templates.keys() if json_key != 'docker'}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching templates: {e}")
+
 
 @app.post('/preview_pattern')
 def preview_pattern(data: dict):
@@ -138,3 +145,8 @@ def create_docker_web(data: dict):
         return {"message": f"Error: {e}", "success": False}
     except Exception as e:
         return {"message": f"An unexpected error occurred: {e}", "success": False}
+
+# --- Static Files ---
+STATIC_DIR = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="spa")
