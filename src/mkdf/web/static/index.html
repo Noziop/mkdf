@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MKDF - Modern Project Creator</title>
+    <link id="theme-link" rel="stylesheet" href="/static/css/dark.css">
+</head>
+<body>
+    <div id="app">
+        <div class="theme-selector">
+            <label for="theme-select">Theme:</label>
+            <select id="theme-select" v-model="selectedTheme" @change="setTheme(selectedTheme)">
+                <option v-for="theme in themes" :value="theme">{{ theme }}</option>
+            </select>
+        </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
