@@ -31,22 +31,25 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-rich = "^13.0.0"
+python = "^3.10"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+pydantic = "^2.5.0"        # ← AJOUT ESSENTIEL !
+sqlmodel = "^0.0.14"
 typer = "^0.9.0"
-pydantic = "^2.0.0"
-flask = "^3.1.1"
-click = "~8.1.7"
-requests = "^2.32.4"
+rich = "^13.0.0"
+requests = "^2.31.0"       # ← Pour HTTP client si besoin
+click = "^8.1.0"           # ← Dépendance Typer
+psutil = "^5.9.5"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-pytest-cov = "^4.0.0"
-black = "^23.0.0"
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+pytest-asyncio = "^0.21.0"  # ← Pour tester FastAPI async
+black = "^23.9.0"
 isort = "^5.12.0"
-mypy = "^1.0.0"
-pre-commit = "^3.0.0"
-pytest-mock = "^3.14.1"
+mypy = "^1.5.0"
+httpx = "^0.25.0"          # ← Pour TestClient FastAPI
 
 [tool.poetry.scripts]
 mkdf = "mkdf.main:main"

@@ -43,3 +43,32 @@ class TemplateFactory:
         if template_type == 'docker':
             return creator(components, project_name=project_name, port_config=port_config)
         return creator()
+
+    def get_all_templates(self) -> Dict[str, List[str]]:
+        """Get all available templates categorized by type."""
+        
+        categorized = {
+            "Backend API": [],
+            "Frontend SPA": [],
+            "Fullstack": [],
+            "Static Site": []
+        }
+        
+        for template_name, creator in self.creators.items():
+            # Si tes creators ont une propriété 'category' ou 'type'
+            if hasattr(creator, 'category'):
+                category = creator.category
+                if category in categorized:
+                    categorized[category].append(template_name)
+            else:
+                # Fallback : catégorisation par nom
+                if template_name in ["fastapi", "flask", "express", "slim", "laravel", "django"]:
+                    categorized["Backend API"].append(template_name)
+                elif template_name in ["vue", "react", "svelte", "angular", "nextjs", "nuxtjs"]:
+                    categorized["Frontend SPA"].append(template_name)
+                elif template_name in ["laravel", "django", "nextjs"]:
+                    categorized["Fullstack"].append(template_name)
+                elif template_name in ["simple", "static", "low_level"]:
+                    categorized["Static Site"].append(template_name)
+        
+        return categorized

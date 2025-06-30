@@ -2,7 +2,7 @@ import typer
 from typing import Optional, List
 
 from ..commands.create import create_command
-from ..commands.web import web_command
+
 from ..commands.interactive import interactive_command
 from ..commands.pattern import pattern_command
 
@@ -59,10 +59,7 @@ def create(
         traefik_dashboard_port
     )
 
-@app.command("web")
-def start_web():
-    """ Start the web interface"""
-    web_command()
+
 
 
 @app.command("interactive", help="Launch interactive mode")
