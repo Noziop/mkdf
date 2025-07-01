@@ -86,7 +86,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # Étape 5: Test rapide
 echo
 log_info "Step 5: Quick test..."
-if python3 -m mkdf.main create --help > /dev/null 2>&1; then
+if mkdf --help > /dev/null 2>&1; then
     log_info "MKDF successfully installed and working!"
     echo
     echo "🎉 Ready to test your changes!"
@@ -98,11 +98,15 @@ fi
 
 # Étape 6: Relancer le serveur web
 echo
-log_info "Step 6: Restarting web server..."
-if mkdf web start; then
-    log_info "Web server started successfully."
-else
-    log_error "Failed to start the web server."
+log_info "do you want to restart the web server? (y/n)"
+read -r RESTART_WEB
+if [[ "$RESTART_WEB" == "y" ]]; then
+    log_info "Step 6: Restarting web server..."
+    if mkdf web start; then
+        log_info "Web server started successfully."
+    else
+        log_error "Failed to start the web server."
+    fi
     exit 1
 fi
 
