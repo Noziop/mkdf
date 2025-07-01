@@ -34,50 +34,30 @@ pip install -e .  # for now, will be pushed on PyPI soon
 ### 1. Create a FastAPI project in one command
 
 ```bash
-mkdf create my-api fastapi
+» mkdf create my-f-api fastapi                                                                                           8s 233s 89s 8s
+2025-07-01 08:38:21,628 - INFO - Found available subnet: 172.22.0.0/16
+2025-07-01 08:38:21,628 - INFO - Found free port: 8001
+2025-07-01 08:38:21,629 - INFO - Found free port: 3000
+2025-07-01 08:38:21,629 - INFO - Found free port: 6379
+2025-07-01 08:38:21,629 - INFO - Found free port: 9090
+2025-07-01 08:38:21,629 - INFO - Found free port: 3001
+2025-07-01 08:38:21,629 - INFO - Found free port: 8082
+2025-07-01 08:38:21,629 - INFO - Found free port: 8090
+2025-07-01 08:38:21,630 - INFO - Found free port: 8085
+╭─────────────────────────────────────────────────── ✨ Project Created Successfully ───────────────────────────────────────────────────╮
+│  You're all set! Better get yourself coding this brilliant idea of yours!                                                             │
+│                                                                                                                                       │
+│  Project 'my-f-api' created successfully!                                                                                             │
+│  Location: ./my-f-api                                                                                                                 │
+│                                                                                                                                       │
+│ Next steps:                                                                                                                           │
+│   cd ./my-f-api                                                                                                                       │
+│   pip install -r requirements.txt                                                                                                     │
+│   python main.py                                                                                                                      │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-Example output of tree -h after creation:
 
-```bash
-» tree -h projetcombo
-[4.0K]  projetcombo
-├── [4.0K]  backend
-│   ├── [ 394]  Dockerfile
-│   ├── [4.0K]  app
-│   │   ├── [   0]  __init__.py
-│   │   ├── [4.0K]  api
-│   │   │   ├── [   0]  __init__.py
-│   │   │   └── [4.0K]  v1
-│   │   │       ├── [   0]  __init__.py
-│   │   │       ├── [4.0K]  endpoints
-│   │   │       │   ├── [   0]  __init__.py
-│   │   │       │   ├── [ 129]  health.py
-│   │   │       │   └── [ 151]  users.py
-│   │   │       └── [ 252]  router.py
-│   │   ├── [4.0K]  core
-│   │   │   ├── [   0]  __init__.py
-│   │   │   └── [ 449]  config.py
-│   │   ├── [ 587]  main.py
-│   │   └── [4.0K]  models
-│   │       ├── [   0]  __init__.py
-│   │       └── [  96]  user.py
-│   ├── [ 168]  requirements.txt
-│   └── [4.0K]  tests
-│       ├── [   0]  __init__.py
-│       └── [ 416]  test_main.py
-├── [ 981]  docker-compose.yml
-└── [4.0K]  frontend
-    ├── [ 151]  Dockerfile
-    ├── [ 291]  index.html
-    ├── [ 290]  package.json
-    ├── [4.0K]  src
-    │   ├── [ 345]  App.vue
-    │   └── [  92]  main.js
-    └── [ 179]  vite.config.js
-
-10 directories, 23 files
-```
 
 ### 2. Generate a custom structure (god mode -1)
 
@@ -88,7 +68,64 @@ mkdf my-app/{src/{api,models,services},docs/{README.md,INSTALL.md},tests/test_ap
 ### 3. Docker combo with real preview
 
 ```bash
-mkdf create my-stack docker fastapi vue redis traefik --backend-port 8080 --frontend-port 3000
+» mkdf create my-stack docker fastapi vue redis traefik --backend-port 8080 --frontend-port 3000                         8s 233s 89s 8s
+2025-07-01 08:34:32,500 - INFO - Found available subnet: 172.22.0.0/16
+2025-07-01 08:34:32,501 - INFO - Found free port: 6379
+2025-07-01 08:34:32,501 - INFO - Found free port: 9090
+2025-07-01 08:34:32,501 - INFO - Found free port: 3001
+2025-07-01 08:34:32,501 - INFO - Found free port: 8082
+2025-07-01 08:34:32,501 - INFO - Found free port: 8090
+2025-07-01 08:34:32,501 - INFO - Found free port: 8085
+╭─────────────────────────────────────────────────── ✨ Project Created Successfully ───────────────────────────────────────────────────╮
+│  You're all set! Better get yourself coding this brilliant idea of yours!                                                             │
+│                                                                                                                                       │
+│  Project 'my-stack' created successfully!                                                                                             │
+│  Location: ./my-stack                                                                                                                 │
+│                                                                                                                                       │
+│ Next steps:                                                                                                                           │
+│   cd ./my-stack                                                                                                                       │
+│   Start coding!                                                                                                                       │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+~/projects/test_mkdf
+» tree -h my-stack                                                                                                       8s 233s 89s 8s
+[4.0K]  my-stack
+├── [4.0K]  backend
+│   ├── [ 394]  Dockerfile
+│   ├── [4.0K]  app
+│   │   ├── [   0]  __init__.py
+│   │   ├── [4.0K]  api
+│   │   │   ├── [   0]  __init__.py
+│   │   │   └── [4.0K]  v1
+│   │   │       ├── [   0]  __init__.py
+│   │   │       ├── [4.0K]  endpoints
+│   │   │       │   ├── [   0]  __init__.py
+│   │   │       │   ├── [ 129]  health.py
+│   │   │       │   └── [ 151]  users.py
+│   │   │       └── [ 252]  router.py
+│   │   ├── [4.0K]  core
+│   │   │   ├── [   0]  __init__.py
+│   │   │   └── [ 449]  config.py
+│   │   ├── [ 587]  main.py
+│   │   └── [4.0K]  models
+│   │       ├── [   0]  __init__.py
+│   │       └── [  96]  user.py
+│   ├── [ 168]  requirements.txt
+│   └── [4.0K]  tests
+│       ├── [   0]  __init__.py
+│       └── [ 416]  test_main.py
+├── [2.0K]  docker-compose.yml
+├── [4.0K]  frontend
+│   ├── [ 151]  Dockerfile
+│   ├── [ 291]  index.html
+│   ├── [ 290]  package.json
+│   ├── [4.0K]  src
+│   │   ├── [ 345]  App.vue
+│   │   └── [  92]  main.js
+│   └── [ 179]  vite.config.js
+└── [4.0K]  traefik
+    └── [ 207]  traefik.yml
+
+11 directories, 24 files
 ```
 
 ## Documentation and Organization

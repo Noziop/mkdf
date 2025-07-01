@@ -1,10 +1,11 @@
+import os
+import sys
 import typer
 from typing import Optional, List
 
 from ..commands.create import create_command
-
 from ..commands.interactive import interactive_command
-from ..commands.pattern import pattern_command
+from ...fs.fs_utils import is_path_safe
 
 app = typer.Typer(
     name="mkdf",
@@ -59,37 +60,15 @@ def create(
         traefik_dashboard_port
     )
 
-
-
-
-@app.command("interactive", help="Launch interactive mode")
-def interactive_cmd():
-    """Launch interactive mode"""
-    interactive_command()
-
-
 @app.callback()
 def main(
     ctx: typer.Context,
-    i: bool = typer.Option(
-        False, "-i", "--interactive", help="Launch interactive mode"
-    ),
+    i: bool = typer.Option(False, "-i", "--interactive", help="Launch interactive mode"),
 ):
-    """
-    Main callback to handle top-level options and commands.
-    """
     if ctx.invoked_subcommand is not None:
         return
-
+    if i:
+        interactive_command()
+        raise typer.Exit()
     interactive_command()
     raise typer.Exit()
-
-
-@app.command("pattern")
-def pattern_create(
-    pattern: str = typer.Argument(
-        ..., help="Brace expansion pattern to create directories and files"
-    )
-):
-    """ Create directories and files from a brace expansion pattern"""
-    pattern_command(pattern)

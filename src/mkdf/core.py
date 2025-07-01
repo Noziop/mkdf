@@ -4,10 +4,18 @@ from .fs.brace_expansion import brace_expand
 from .fs.path_analyzer import is_file_path
 from .fs.dir_creator import create_directory
 from .fs.file_creator import create_file
+from .fs.fs_utils import is_path_safe  # Import for path safety check
 from .templates.template_factory import TemplateFactory
 from .utils import show_error, create_with_progress # Import for error and progress
 
 config_manager = ConfigManager()
+
+def create_simple_path(path: str):
+    """Creates a simple file or directory based on the provided path."""
+    if is_file_path(path):
+        create_file(path)
+    else:
+        create_directory(path)
 
 def create_from_pattern(pattern: str, overwrite: bool = False):
     """

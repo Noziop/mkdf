@@ -1,6 +1,6 @@
 import shutil
 from pathlib import Path
-from .fs_utils import _to_pathlib_path
+from .fs_utils import _to_pathlib_path, is_path_safe
 
 def create_directory(path: str | Path, overwrite: bool = True):
     """Creates a directory, with recursive creation.
@@ -13,6 +13,8 @@ def create_directory(path: str | Path, overwrite: bool = True):
         FileExistsError: If the directory already exists and overwrite is False.
         OSError: For other operating system related errors during directory creation.
     """
+    if not is_path_safe(path):
+        raise ValueError(f"Unsafe path detected: {path}. Please choose a different path.")
     path_obj = _to_pathlib_path(str(path))
     try:
         if path_obj.exists():
