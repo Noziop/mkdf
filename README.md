@@ -1,16 +1,23 @@
 # MKDF – Make Directories and Files
 
-[![Python](https://img.shields.io/badge/python-3.10%etry](https://img.shields.io/badge/poetry-managed-4BAPI](https://img.shields.io/badge/fastapi-async-green?.js](https://img.shields.io/badge/vue.js-3.x-brightgreen](https://img.shields.io/badge/sqlite-embedded-lightgreyPL v3](https://img.shields.io/badge/license-AGPL--vish your git flow or perish!](https://img.shields.io/badge/cherish%20your%20git%20flow%20or%20perishvived rm -rf *](https://img.shields.io/badge/SURVIVED--rm--rf--*-redish your git flow or perish!
+![Version](https://img.shields.io/badge/python-3.10-4BAPI)
+![Poetry](https://img.shields.io/badge/poetry-managed-4BAPI)
+![FastAPI](https://img.shields.io/badge/fastapi-async-green?.js)
+![Vue3](https://img.shields.io/badge/vue.js-3.x-brightgreen)
+![SQLite](https://img.shields.io/badge/sqlite-embedded-lightgreyPL)
+![GNU AGPL](https://img.shields.io/badge/license-AGPL)
+![Cherish your Git flow or perish](https://img.shields.io/badge/Cherish%20your%20gitflow-%20or%20perish%20-red)
+![Survived rm -rf *](https://img.shields.io/badge/SURVIVED---rm--rf--*-red)
 
 ## What is MKDF?
 
-MKDF is a professional, open source project structure generator for all developers: from juniors who want to learn fast or discover new frameworks, to architects who want to go even faster, to devops who want everything automated.
+MKDF is a professional, open source project structure generator for all developers: from juniors who want to learn fast or discover new frameworks, architects who want to go even faster, to devops who want everything automated.
 
 - Modern package stack: Python 3.10+, Poetry, automated rebuild package script
 - CLI: interactive mode built with Typer and Click
 - Web interface: FastAPI (SQLModel + Pydantic) + Vue.js 3 + SQLite
 - Command line usage:
-  - No arguments: launch CLI interactive mode
+  - No arguments: launch CLI interactive mode, with a clear terminal.
   - Path with brace expansion: create directories and files simultaneously (mkdir + touch)
   - Create command: guided mode or one-liner for template names or docker templates
 - Docker combos: multi-service docker combos ready to code, with port and docker subnet scanning to avoid conflicts
@@ -22,6 +29,10 @@ Philosophy of the project: "Cherish your git flow or perish!"
 For now, MKDF is not published on PyPI. You can install it locally using editable mode or use the rebuild script:
 
 ```bash
+# clone this repo
+git clone https://github.com/Noziop/mkdf-py.git ~/mkdf && cd ~/mkdf
+
+# install the package
 pip install -e .  # for now, will be pushed on PyPI soon
 
 # or
@@ -31,7 +42,56 @@ pip install -e .  # for now, will be pushed on PyPI soon
 
 ## Quick Start
 
-### 1. Create a FastAPI project in one command
+### 0. How to use :
+
+```bash
+» mkdf --help
+
+ Usage: mkdf [OPTIONS] COMMAND [ARGS]...
+
+ MKDF - Professional project structure creator
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --interactive  -i        Launch interactive mode                                                                     │
+│ --help                   Show this message and exit.                                                                 │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ create         Create a new project from template or Docker combo.                                                   │
+│ web                                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+### 1. CLI
+
+```bash
+
+__/\\\\____________/\\\\__/\\\________/\\\__/\\\\\\\\\\\\_____/\\\\\\\\\\\\\\\_
+ _\/\\\\\\________/\\\\\\_\/\\\_____/\\\//__\/\\\////////\\\__\/\\\///////////__
+  _\/\\\//\\\____/\\\//\\\_\/\\\__/\\\//_____\/\\\______\//\\\_\/\\\_____________
+   _\/\\\\///\\\/\\\/_\/\\\_\/\\\\\\//\\\_____\/\\\_______\/\\\_\/\\\\\\\\\\\_____
+    _\/\\\__\///\\\/___\/\\\_\/\\\//_\//\\\____\/\\\_______\/\\\_\/\\\///////______
+     _\/\\\____\///_____\/\\\_\/\\\____\//\\\___\/\\\_______\/\\\_\/\\\_____________
+      _\/\\\_____________\/\\\_\/\\\_____\//\\\__\/\\\_______/\\\__\/\\\_____________
+       _\/\\\_____________\/\\\_\/\\\______\//\\\_\/\\\\\\\\\\\\/___\/\\\_____________
+        _\///______________\///__\///________\///__\////////////_____\///______________
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+️‍ Make Directories and Files - Professional Project Creator - By github.com/Noziop
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                 Available Actions
+┏━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Option ┃ Description                            ┃
+┡━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 1      │  Create from pattern (brace expansion) │
+│ 2      │  Create from template                  │
+│ 3      │  Create Docker combo                   │
+│ 4      │  Configure settings                    │
+│ 0      │  Exit                                  │
+└────────┴────────────────────────────────────────┘
+Your choice:
+```
+
+### 2. Create a FastAPI project in one command
 
 ```bash
 » mkdf create my-f-api fastapi                                                                                           8s 233s 89s 8s
@@ -59,13 +119,23 @@ pip install -e .  # for now, will be pushed on PyPI soon
 
 
 
-### 2. Generate a custom structure (god mode -1)
+### 3. Generate a custom structure, dir and files (oneliner)
 
 ```bash
-mkdf my-app/{src/{api,models,services},docs/{README.md,INSTALL.md},tests/test_api.py,.env}
+» mkdf my-app/{src/{api,models,services},docs/{README.md,INSTALL.md},tests/test_api.py,.env}
+╭────────────────────────────────────────── ✨ Project Created Successfully ───────────────────────────────────────────╮
+│  You're all set! Better get yourself coding this brilliant idea of yours!                                            │
+│                                                                                                                      │
+│  Project 'file structure' created successfully!                                                                      │
+│  Location: /home/noziop/projects/test_mkdf/my-app                                                                    │
+│                                                                                                                      │
+│ Next steps:                                                                                                          │
+│   cd /home/noziop/projects/test_mkdf/my-app                                                                          │
+│   Happy coding! 🚀                                                                                                   │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-### 3. Docker combo with real preview
+### 34. Docker combo Creation 
 
 ```bash
 » mkdf create my-stack docker fastapi vue redis traefik --backend-port 8080 --frontend-port 3000                         8s 233s 89s 8s
@@ -156,8 +226,3 @@ Note: Logging and log rotation are not yet implemented in the app and will be ad
 ## License
 
 GNU Affero General Public License v3 (AGPL) – Open source, for everyone.
-
-```
-
-N’hésite pas à adapter, compléter ou corriger ce texte.  
-Prêt à être collé, badges à personnaliser selon tes besoins !
