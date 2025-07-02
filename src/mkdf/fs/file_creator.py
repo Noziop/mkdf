@@ -1,5 +1,5 @@
 from pathlib import Path
-from .fs_utils import _to_pathlib_path
+from .fs_utils import _to_pathlib_path, is_path_safe
 from .dir_creator import create_directory
 
 def create_file(path: str | Path, content: str = '', overwrite: bool = True):
@@ -14,6 +14,8 @@ def create_file(path: str | Path, content: str = '', overwrite: bool = True):
         FileExistsError: If the file already exists and overwrite is False.
         IOError: For other input/output related errors during file creation.
     """
+    if not is_path_safe(path):
+        raise ValueError(f"Unsafe path detected: {path}. Please choose a different path.")
     path_obj = _to_pathlib_path(str(path))
     try:
         if path_obj.exists() and not overwrite:

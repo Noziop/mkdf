@@ -24,7 +24,8 @@ def is_server_running():
 from mkdf.utils import find_free_port
 
 @web.command("start")
-def start_web_server(port: int = typer.Option(None, "--port", "-p", help="Port to run the server on."), detach: bool = typer.Option(True, "--detach/--no-detach", help="Run in detached (background) mode.")):
+def start_web_server(port: int = typer.Option(None, "--port", "-p", help="Port to run the server on."), 
+                    detach: bool = typer.Option(True, "--detach/--no-detach", help="Run in detached (background) mode.")):
     """Starts the MKDF web server."""
     if is_server_running():
         print("Server is already running.")

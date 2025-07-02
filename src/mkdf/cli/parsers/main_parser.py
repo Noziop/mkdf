@@ -2,13 +2,19 @@ import typer
 from typing import Optional, List
 
 from ..commands.create import create_command
-
 from ..commands.interactive import interactive_command
-from ..commands.pattern import pattern_command
 
 app = typer.Typer(
     name="mkdf",
-    help=" MKDF - Professional project structure creator",
+    help="MKDF - Professional project structure creator.",
+    epilog=(
+        "Examples:\n"
+        "  mkdf myapp/{src/,docs/readme.md}      # Direct structure creation (no command)\n"
+        "  mkdf create myapp fastapi             # Create from template\n"
+        "  mkdf web                              # Launch web interface\n"
+        "  mkdf -i                               # Interactive mode\n"
+        "\nNote: COMMAND is optional. If omitted, you can use patterns or interactive mode."
+    ),
     add_completion=False,
     invoke_without_command=True,
 )
@@ -59,37 +65,22 @@ def create(
         traefik_dashboard_port
     )
 
-
-
-
-@app.command("interactive", help="Launch interactive mode")
-def interactive_cmd():
-    """Launch interactive mode"""
-    interactive_command()
-
-
 @app.callback()
 def main(
     ctx: typer.Context,
-    i: bool = typer.Option(
-        False, "-i", "--interactive", help="Launch interactive mode"
-    ),
+    i: bool = typer.Option(False, "-i", "--interactive", help="Launch interactive mode"),
 ):
-    """
-    Main callback to handle top-level options and commands.
+    """MKDF - Professional project structure creator.
+    This tool allows you to create complex project structures with ease, using templates or Docker combos.
+    mkdf can also be used in interactive mode for guided project creation.
+    usage: mdkf => launch interactive mode
+    usage: mkdf create <project_name> <template_or_combo> [components...] => create a new project from template or Docker combo
+    usage: mkdf web => launch the web interface for MKDF
     """
     if ctx.invoked_subcommand is not None:
         return
-
+    if i:
+        interactive_command()
+        raise typer.Exit()
     interactive_command()
     raise typer.Exit()
-
-
-@app.command("pattern")
-def pattern_create(
-    pattern: str = typer.Argument(
-        ..., help="Brace expansion pattern to create directories and files"
-    )
-):
-    """ Create directories and files from a brace expansion pattern"""
-    pattern_command(pattern)
