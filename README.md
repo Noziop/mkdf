@@ -1,6 +1,6 @@
 # MKDF - MaKeDir&Files
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-0.0.1-blue.svg)
 ![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)
 
 Un outil puissant pour créer rapidement des structures de répertoires et de fichiers à partir d'expressions simplifiées.
