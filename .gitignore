@@ -30,3 +30,6 @@ Thumbs.db
 *.log
 *.tmp
 *.txt
+refactor/build/
+*.o
+*.exe
