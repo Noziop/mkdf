@@ -24,30 +24,65 @@ def is_server_running():
 from mkdf.utils import find_free_port
 
 @web.command("start")
-def start_web_server(port: int = typer.Option(None, "--port", "-p", help="Port to run the server on."), 
-                    detach: bool = typer.Option(True, "--detach/--no-detach", help="Run in detached (background) mode.")):
-    """Starts the MKDF web server."""
-    if is_server_running():
-        print("Server is already running.")
-        return
-
-    if port is None:
-        port = find_free_port()
-
-    if detach:
-        # Background with PID file
-        pid = os.fork()
-        if pid == 0:
-            # Child process
-            with open(PID_FILE, "w") as f:
-                f.write(str(os.getpid()))
-            uvicorn.run(app, host="0.0.0.0", port=port)
-        else:
-            # Parent process
-            print(f"Server started in background with PID {pid} on port {port}.")
+def start_web_server(
+    back_port: int = typer.Option(None, "--back-port", help="Backend port"),
+    front_port: int = typer.Option(None, "--front-port", help="Frontend port"),  
+    detach: bool = typer.Option(True, "--detach/--no-detach")
+):
+    from mkdf.web.backend.core.config import Settings
+    settings = Settings()
+    
+    # Gestion intelligente des ports
+    if back_port:
+        # Port spécifié par user → Scan à partir de ce port si occupé
+        backend_port = find_free_port(back_port)
+        if backend_port != back_port:
+            print(f"⚠️  Port {back_port} occupé, utilise {backend_port} à la place")
     else:
-        # Foreground
-        uvicorn.run(app, host="0.0.0.0", port=port)
+        # Port depuis config.json
+        backend_port = find_free_port(settings.web_port_start)
+    
+    if front_port:
+        # Port spécifié par user → Scan à partir de ce port si occupé  
+        frontend_port = find_free_port(front_port)
+        if frontend_port != front_port:
+            print(f"⚠️  Port {front_port} occupé, utilise {frontend_port} à la place")
+    else:
+        # Port standard frontend
+        frontend_port = find_free_port(3000)
+    
+    print(f"🚀 MKDF Web starting...")
+    print(f"📡 Backend:  http://localhost:{backend_port}")
+    print(f"🎨 Frontend: http://localhost:{frontend_port}")
+
+    start_dual_servers(backend_port, frontend_port)
+
+def start_dual_servers(backend_port, frontend_port):
+    import subprocess
+    import threading
+    
+    # Backend FastAPI
+    def run_backend():
+        from mkdf.web.backend.main import app
+        uvicorn.run(app, host="127.0.0.1", port=backend_port)
+    
+    # Frontend Vite dev server  
+    def run_frontend():
+        frontend_dir = Path(__file__).parent.parent.parent / "web" / "frontend"
+        subprocess.run([
+            "npm", "run", "dev", "--", "--port", str(frontend_port)
+        ], cwd=frontend_dir)
+    
+    # Lance les deux en parallèle
+    backend_thread = threading.Thread(target=run_backend)
+    frontend_thread = threading.Thread(target=run_frontend)
+    
+    backend_thread.start()
+    frontend_thread.start()
+    
+    # Attendre les deux
+    backend_thread.join()
+    frontend_thread.join()
 
 @web.command("stop")
 def stop_web_server():
