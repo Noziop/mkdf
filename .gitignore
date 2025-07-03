@@ -9,6 +9,7 @@
 /mkdf
 !/mkdf.1
 !/mkdf.en.1
+/test
 
 # Dossiers de build
 /build/*
@@ -28,3 +29,7 @@ Thumbs.db
 # Autres fichiers temporaires
 *.log
 *.tmp
+*.txt
+refactor/build/
+*.o
+*.exe
