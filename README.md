@@ -1,15 +1,18 @@
 # MKDF – Make Directories and Files
 
-![Version](https://img.shields.io/badge/python-3.10-4BAPI)
-![Poetry](https://img.shields.io/badge/poetry-managed-4BAPI)
-![FastAPI](https://img.shields.io/badge/fastapi-async-green?.js)
-![Vue3](https://img.shields.io/badge/vue.js-3.x-brightgreen)
-![SQLite](https://img.shields.io/badge/sqlite-embedded-lightgreyPL)
-![GNU AGPL](https://img.shields.io/badge/license-AGPL)
+![Version](https://img.shields.io/badge/python-3.10+-blue)
+![Poetry](https://img.shields.io/badge/poetry-managed-blue)
+![FastAPI](https://img.shields.io/badge/fastapi-async-green)
+![SQLite](https://img.shields.io/badge/sqlite-embedded-lightgrey)
+![GNU AGPL](https://img.shields.io/badge/license-AGPL-blue)
+![GitHub release](https://img.shields.io/github/v/release/Noziop/mkdf?include_prereleases)
+![GitHub issues](https://img.shields.io/github/issues/Noziop/mkdf)
 ![Cherish your Git flow or perish](https://img.shields.io/badge/Cherish%20your%20gitflow-%20or%20perish%20-red)
 ![Survived rm -rf *](https://img.shields.io/badge/SURVIVED---rm--rf--*-red)
 
 ## What is MKDF?
+
+**One command to create them all, one command to find all ports and subnet, and in the docker-compose bind them.** 
 
 MKDF is a professional, open source project structure generator for all developers: from juniors who want to learn fast or discover new frameworks, architects who want to go even faster, to devops who want everything automated.
 
@@ -30,7 +33,7 @@ For now, MKDF is not published on PyPI. You can install it locally using editabl
 
 ```bash
 # clone this repo
-git clone https://github.com/Noziop/mkdf-py.git ~/mkdf && cd ~/mkdf
+git clone https://github.com/Noziop/mkdf.git ~/mkdf && cd ~/mkdf
 
 # install the package
 pip install -e .  # for now, will be pushed on PyPI soon
@@ -57,7 +60,7 @@ pip install -e .  # for now, will be pushed on PyPI soon
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ create         Create a new project from template or Docker combo.                                                   │
-│ web                                                                                                                  │
+│ web            Launch internal web server - no SaaS                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
@@ -135,7 +138,7 @@ Your choice:
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-### 34. Docker combo Creation 
+### 4. Docker combo Creation 
 
 ```bash
 » mkdf create my-stack docker fastapi vue redis traefik --backend-port 8080 --frontend-port 3000                         8s 233s 89s 8s
@@ -206,7 +209,7 @@ Your choice:
 - Docker combos and advanced usage in docs/SENIOR.md
 - God mode -1: advanced docker combos with port management in docs/GODMODE.md
 - Fun facts and project philosophy in docs/FUN_FACTS.md
-- Full contribution process in docs/CONTRIBUTING.md
+
 
 Note: Logging and log rotation are not yet implemented in the app and will be addressed in future updates.
 
@@ -216,13 +219,35 @@ Note: Logging and log rotation are not yet implemented in the app and will be ad
 - “Cherish your git flow or perish!” is not just a slogan, it’s a way of life here.
 - All community suggestions are welcome, even the wildest ones.
 
-## Contribution
+## Contributing
 
-- Fork, clone, propose ideas, fix bugs, add templates, CSS themes, or workflows.
-- Join the community (Discord/Matrix/Forum coming soon).
-- Respect, kindness, and humor required.
-- See docs/CONTRIBUTING.md for the full process.
+Currently, MKDF is in active development and we're not accepting code contributions. 
+However, we welcome:
+- Bug reports
+- Feature suggestions  
+- Documentation improvements
+- Usage feedback
+
+For commercial partnerships, please contact [license@buildme.it](mailto:license@buildme.it)
 
 ## License
 
-GNU Affero General Public License v3 (AGPL) – Open source, for everyone.
+**MKDF is distributed under the [GNU Affero General Public License v3.0](LICENSE) for most purposes.**
+
+This means you are free to use, modify, and distribute MKDF for:
+* Personal development and learning
+* Student and educational projects
+* Freelance projects for clients (MKDF is used as a tool to generate project structures)
+* Internal use within companies
+* Any use where you comply with AGPL requirements (sharing source code modifications)
+
+**For commercial use where you cannot or do not want to comply with AGPL requirements** (such as integrating MKDF into proprietary software without releasing your source code), **a separate commercial license is available.**
+
+Examples of commercial use requiring a license:
+* Integration of MKDF code into proprietary software products
+* Offering MKDF as a service without making your service's source code available
+* Distributing MKDF as part of a commercial product without AGPL compliance
+
+For commercial licensing, please contact us at [license@buildme.it](mailto:license@buildme.it) to discuss terms.
+
+**Why AGPL?** We believe in open source development and want to ensure that improvements to MKDF benefit the entire community. The AGPL ensures that any modifications or improvements are shared back with everyone.
