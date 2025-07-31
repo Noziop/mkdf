@@ -88,6 +88,21 @@ def brace_expand(pattern: str) -> list[str]:
             expanded_option_recursive = brace_expand(r_option)
             for o in expanded_option_recursive:
                 for s in expanded_suffix:
-                    results.append(prefix + o + s)
+                    # Simple and robust path joining:
+                    # - If option starts with "/", it's absolute from prefix
+                    # - If prefix ends with "/" or is empty, concatenate directly
+                    # - If both prefix and option exist and prefix doesn't end with "/", add separator
+                    if o.startswith('/') or prefix.endswith('/') or not prefix:
+                        combined = prefix + o + s
+                    else:
+                        # Check if this looks like a path context (contains / or ends with /)
+                        # Only add / if we're in a path-like context
+                        if ('/' in prefix or '/' in o or o.endswith('/') or 
+                            # Special case: if option looks like a filename, we're likely in a directory context
+                            ('.' in o and not o.startswith('.'))):
+                            combined = prefix + '/' + o + s
+                        else:
+                            combined = prefix + o + s
+                    results.append(combined)
 
     return sorted(list(set(results)))
