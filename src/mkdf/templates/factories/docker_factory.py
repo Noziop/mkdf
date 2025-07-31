@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 from ..docker.registry import get_service
-from ..docker.base.db_utils import detect_database_service
+from ..docker.base.db_utils import detect_database_service, detect_all_database_services
 from ...utils import find_free_port, find_free_subnet
 from ...config.config_manager import ConfigManager
 import ipaddress
@@ -73,7 +73,10 @@ class DockerComposeFactory:
 
         # .env file generation
         env_vars = [f'PROJECT_NAME={project_name}']
-        if db_config and 'env_vars' in db_config:
+        
+        # Handle multiple databases
+        db_configs = detect_all_database_services(components)
+        for db_config in db_configs:
             env_vars.extend(db_config['env_vars'])
         
         if backend_type:
@@ -193,7 +196,8 @@ class DockerComposeFactory:
                 if key == 'build' and isinstance(value, dict):
                     compose_content.append("    build:")
                     compose_content.append(f"      context: {value['context']}")
-                    compose_content.append(f"      dockerfile: {value['dockerfile']}")
+                    if 'dockerfile' in value:
+                        compose_content.append(f"      dockerfile: {value['dockerfile']}")
                 elif isinstance(value, list):
                     compose_content.append(f"    {key}:")
                     for item in value:

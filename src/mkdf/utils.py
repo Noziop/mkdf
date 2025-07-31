@@ -46,7 +46,7 @@ def find_free_port(start_port=1025, max_attempts=500):
     raise RuntimeError(f"No free port found in range {start_port}-{start_port + max_attempts}")
 
 
-def find_free_subnet(start_octet=18, max_attempts=100):
+def find_free_subnet(start_octet=18, max_attempts=100, quiet=False):
     """Find an available /16 subnet in the 172.x.0.0 range for Docker networks."""
     existing_subnets = set()
     
@@ -79,9 +79,11 @@ def find_free_subnet(start_octet=18, max_attempts=100):
                                 logging.warning(f"Ignoring invalid subnet from Docker network inspection: {config['Subnet']}")
 
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        logging.warning(f"Could not inspect Docker networks: {e}. Assuming no conflicts and proceeding.")
+        if not quiet:
+            logging.warning(f"Could not inspect Docker networks: {e}. Assuming no conflicts and proceeding.")
     except json.JSONDecodeError:
-        logging.warning("Failed to parse Docker network inspection output.")
+        if not quiet:
+            logging.warning("Failed to parse Docker network inspection output.")
 
     for i in range(max_attempts):
         octet = start_octet + i
@@ -92,7 +94,8 @@ def find_free_subnet(start_octet=18, max_attempts=100):
         candidate_subnet = ipaddress.ip_network(subnet_str, strict=False)
         
         if not any(candidate_subnet.overlaps(existing) for existing in existing_subnets):
-            logging.info(f"Found available subnet: {subnet_str}")
+            if not quiet:
+                logging.info(f"Found available subnet: {subnet_str}")
             return subnet_str
             
     logging.error("Failed to find an available Docker subnet.")

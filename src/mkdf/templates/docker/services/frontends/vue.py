@@ -90,7 +90,7 @@ export default defineConfig({{
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>''',
-            'src/main.js': '''import {{ createApp }} from 'vue'
+            'src/main.js': '''import { createApp } from 'vue'
 import App from './App.vue'
 
 createApp(App).mount('#app')

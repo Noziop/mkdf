@@ -35,8 +35,11 @@ def expert_create_mode(
     """Expert mode for project creation."""
     project_full_path = os.path.join(project_path, project_name)
 
-    if Path(project_full_path).exists() and not force:
-        if typer.confirm(f"Directory '{project_full_path}' already exists. Overwrite?", default=False):
+    if Path(project_full_path).exists():
+        if force:
+            overwrite = True
+            console.print("✨ Force overwrite enabled, proceeding...", style="green")
+        elif typer.confirm(f"Directory '{project_full_path}' already exists. Overwrite?", default=False):
             console.print(f"⚠️  This will permanently DELETE all files in '{project_full_path}'", style="red")
             typer.confirm("Are you absolutely sure?", abort=True)
             overwrite = True
@@ -45,7 +48,7 @@ def expert_create_mode(
             console.print("Project creation cancelled.", style="yellow")
             raise typer.Exit()
     else:
-        overwrite = force
+        overwrite = False
 
     port_config = {
         'backend': backend_port,

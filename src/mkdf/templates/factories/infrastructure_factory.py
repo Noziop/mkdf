@@ -8,6 +8,9 @@ from mkdf.templates.docker.services.infrastructure.redis import RedisService
 from mkdf.templates.docker.services.infrastructure.celery import CeleryService
 from mkdf.templates.docker.services.infrastructure.prometheus import PrometheusService
 from mkdf.templates.docker.services.infrastructure.grafana import GrafanaService
+from mkdf.templates.docker.services.infrastructure.rabbitmq import RabbitMQService
+from mkdf.templates.docker.services.infrastructure.loki import LokiService
+from mkdf.templates.docker.services.infrastructure.promtail import PromtailService
 
 
 class InfrastructureFactory:
@@ -17,8 +20,11 @@ class InfrastructureFactory:
             "traefik": TraefikService,
             "redis": RedisService,
             "celery": CeleryService,
+            "rabbitmq": RabbitMQService,
             "prometheus": PrometheusService,
             "grafana": GrafanaService,
+            "loki": LokiService,
+            "promtail": PromtailService,
             "monitoring": MonitoringService, # Composite service
         }
 

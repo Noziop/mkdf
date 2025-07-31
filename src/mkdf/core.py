@@ -55,7 +55,7 @@ def create_from_template(project_name, template_type, components=None, base_path
         port_config = {}
     if 'subnet' not in port_config or port_config.get('subnet') is None:
         from .utils import find_free_subnet
-        port_config['subnet'] = find_free_subnet()
+        port_config['subnet'] = find_free_subnet(quiet=True)
 
     factory = TemplateFactory()
     project_path = os.path.join(base_path, project_name)
@@ -65,6 +65,19 @@ def create_from_template(project_name, template_type, components=None, base_path
             template = DockerComposeFactory.create(components, project_name, port_config)
         else:
             template = factory.create_template(template_type, components, project_name=project_name)
+            
+            # For template projects with multiple components, generate dynamic .env
+            if components and isinstance(components, list) and len(components) > 1:
+                from .templates.factories.env_factory import EnvFactory
+                # Check if any components are databases or backends
+                all_components = [template_type] + components
+                has_backend = any(comp in EnvFactory.DOCKER_COMPONENT_CATEGORIES.get("Backend", []) for comp in all_components)
+                has_database = any(comp in EnvFactory.DOCKER_COMPONENT_CATEGORIES.get("Database", []) for comp in all_components)
+                
+                if has_backend or has_database:
+                    dynamic_env = EnvFactory.generate(all_components, project_name)
+                    # Override the static .env with dynamic one
+                    template['.env'] = dynamic_env
 
         create_directory(project_path, overwrite=overwrite)
         _create_from_template_recursive(project_path, template, overwrite=overwrite)
