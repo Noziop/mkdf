@@ -2,7 +2,7 @@ from ...utils import find_free_subnet, find_free_port
 
 def get_interactive_port_config():
     """Interactive port configuration"""
-    default_subnet = find_free_subnet()
+    default_subnet = find_free_subnet(quiet=True)
     print("\n=== Port Configuration (press Enter for defaults) ===")
     backend_port = input(f"Backend port [{find_free_port(8000)}]: ").strip() or str(find_free_port(8000))
     frontend_port = input(f"Frontend port [{find_free_port(3000)}]: ").strip() or str(find_free_port(3000))
