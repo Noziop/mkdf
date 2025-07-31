@@ -13,8 +13,15 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Hello FastAPI!"}
+    return {"message": "Wanna Be Startin’ Somethin’ ? MKDF! need docs? check out /docs for swagger API docs :)"}
 
 @app.get("/health")
 async def health_check():
+    if not app.state.ready:
+        return {"status": "unhealthy", "reason": "Application is not ready"}
+    if not app.state.alive:
+        return {"status": "unhealthy", "reason": "Application is not alive"}
+    from .core import database
+    if not database.is_connected():
+        return {"status": "unhealthy", "reason": "Database connection is not healthy"}
     return {"status": "healthy"}

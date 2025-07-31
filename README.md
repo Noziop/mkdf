@@ -27,6 +27,17 @@ MKDF is a professional, open source project structure generator for all develope
 
 Philosophy of the project: "Cherish your git flow or perish!"
 
+## ⚠️ Current Status
+
+**CLI Interface**: ✅ Fully operational 
+**CMD path/template/docker-combos**: ✅ Fully operational  
+**Web Interface**: 🔄 Under stack migration - temporarily non-functional
+
+The web server starts correctly but project creation operations are currently unavailable due to ongoing stack migration (FastAPI + Vue.js modernization).
+
+**Recommended usage**: Use CLI interface or command line for all project creation operations.
+
+
 ## Installation
 
 For now, MKDF is not published on PyPI. You can install it locally using editable mode or use the rebuild script:

@@ -23,44 +23,12 @@ def create_command(
     traefik_dashboard_port: int,
     traefik_https_port: int,
 ):
-    if subnet is None:
-        subnet = find_free_subnet()
-
-    # Define default port values for various services
-    default_port_values = {
-        'backend': 8000,
-        'frontend': 3000,
-        'redis': 6379,
-        'prometheus': 9090,
-        'grafana': 3001,
-        'traefik': 8080,
-        'traefik_dashboard': 8090,
-        'traefik_https': 8085
-    }
-
-    # Assign free ports if not explicitly provided by the user
-    if backend_port is None:
-        backend_port = find_free_port(default_port_values['backend'])
-    if frontend_port is None:
-        frontend_port = find_free_port(default_port_values['frontend'])
-    if redis_port is None:
-        redis_port = find_free_port(default_port_values['redis'])
-    if prometheus_port is None:
-        prometheus_port = find_free_port(default_port_values['prometheus'])
-    if grafana_port is None:
-        grafana_port = find_free_port(default_port_values['grafana'])
-    if traefik_port is None:
-        traefik_port = find_free_port(default_port_values['traefik'])
-    if traefik_dashboard_port is None:
-        traefik_dashboard_port = find_free_port(default_port_values['traefik_dashboard'])
-    if traefik_https_port is None:
-        traefik_https_port = find_free_port(default_port_values['traefik_https'])
-
+    # Early exit for guided mode - no need to compute ports yet
     if project_name is None:
-        return guided_create_mode()
+        return guided_create_mode(force=force)
 
     if template_or_combo is None:
-        return guided_create_mode(project_name=project_name)
+        return guided_create_mode(project_name=project_name, force=force)
 
     # Handle 'preferred' template
     if template_or_combo == "preferred":
@@ -95,6 +63,48 @@ def create_command(
         else:
             print("No preferred Docker combo configured. Falling back to guided mode.")
             return guided_create_mode(project_name=project_name)
+
+    # Now that we know the project type, calculate ports only for Docker projects
+    if template_or_combo == "docker":
+        if subnet is None:
+            subnet = find_free_subnet(quiet=True)
+
+        # Define default port values for various services
+        default_port_values = {
+            'backend': 8000,
+            'frontend': 3000,
+            'redis': 6379,
+            'prometheus': 9090,
+            'grafana': 3001,
+            'traefik': 8080,
+            'traefik_dashboard': 8090,
+            'traefik_https': 8085
+        }
+
+        # Assign free ports if not explicitly provided by the user
+        if backend_port is None:
+            backend_port = find_free_port(default_port_values['backend'])
+        if frontend_port is None:
+            frontend_port = find_free_port(default_port_values['frontend'])
+        if db_port is None:
+            db_port = None  # Will be auto-detected in the factory
+        if redis_port is None:
+            redis_port = find_free_port(default_port_values['redis'])
+        if prometheus_port is None:
+            prometheus_port = find_free_port(default_port_values['prometheus'])
+        if grafana_port is None:
+            grafana_port = find_free_port(default_port_values['grafana'])
+        if traefik_port is None:
+            traefik_port = find_free_port(default_port_values['traefik'])
+        if traefik_dashboard_port is None:
+            traefik_dashboard_port = find_free_port(default_port_values['traefik_dashboard'])
+        if traefik_https_port is None:
+            traefik_https_port = find_free_port(default_port_values['traefik_https'])
+    else:
+        # For non-Docker projects, we don't need most of these ports
+        # Keep the provided values or set reasonable defaults
+        if subnet is None:
+            subnet = "172.18.0.0/16"  # Default subnet, won't be used anyway
 
     expert_create_mode(
         project_name,
