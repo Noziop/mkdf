@@ -8,7 +8,7 @@
 ![GitHub release](https://img.shields.io/github/v/release/Noziop/mkdf?include_prereleases)
 ![GitHub issues](https://img.shields.io/github/issues/Noziop/mkdf)
 ![Cherish your Git flow or perish](https://img.shields.io/badge/Cherish%20your%20gitflow-%20or%20perish%20-red)
-![Survived rm -rf *](https://img.shields.io/badge/SURVIVED---rm--rf--*-red)
+![Survived rm -rf *](https://img.shields.io/badge/SURVIVED-rm%20--rf%20*-red)
 
 ## What is MKDF?
 
