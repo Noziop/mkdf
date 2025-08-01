@@ -27,7 +27,31 @@ MKDF is a professional, open source project structure generator for all develope
 
 Philosophy of the project: "Cherish your git flow or perish!"
 
-## ⚠️ Current Status
+## ⚠️ Current Status (v0.1.1 Alpha)
+
+🚧 **MKDF is in active development with full transparency**
+
+**What works great right now:**
+- ✅ **CLI Interface**: Fully operational and stable
+- ✅ **Project Templates**: React, Vue, FastAPI, Flask, Express, Laravel, etc.
+- ✅ **Docker Combos**: Multi-service projects with automatic port/subnet management
+- ✅ **Brace Expansion**: Advanced path creation with `{dir1,dir2}/{file1,file2}`
+
+**Known issues being fixed:**
+- 🔧 **Environment Variables**: `.env` generation needs refinement (see [TODO](test_mkdf/TODO.md))
+- 🔧 **Backend Templates**: Improving SQLite defaults and Poetry integration
+- 🔧 **Web Interface**: Under stack migration (FastAPI + Vue.js modernization)
+
+**Upcoming improvements:**
+- 🎯 **Smart DB Config**: SQLite by default, `--proto` for memory DB, `--no-db` for stateless APIs
+- 🎯 **Poetry First**: Modern Python dependency management by default
+- 🎯 **Unified Backend Factory**: Consistent configuration across all frameworks
+
+**Why share this early?** We believe in transparent development. MKDF already solves real problems for many developers, and community feedback helps us prioritize the right improvements.
+
+**Recommended usage**: CLI interface for all operations. Avoid web interface until migration completes.
+
+## ⚠️ Legacy Status Info
 
 **CLI Interface**: ✅ Fully operational 
 **CMD path/template/docker-combos**: ✅ Fully operational  
@@ -35,8 +59,7 @@ Philosophy of the project: "Cherish your git flow or perish!"
 
 The web server starts correctly but project creation operations are currently unavailable due to ongoing stack migration (FastAPI + Vue.js modernization).
 
-**Recommended usage**: Use CLI interface or command line for all project creation operations.
-
+**Recommended usage**: CLI interface for all operations. Avoid web interface until migration completes.
 
 ## Installation
 
