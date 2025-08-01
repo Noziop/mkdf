@@ -76,7 +76,7 @@ def test_template_creation_workflow(mock_all_dependencies, mocker):
     result = runner.invoke(app, ["create", "myproject", "react"])
     assert result.exit_code == 0
     mock_expert_create_mode.assert_called_once_with(
-        "myproject", "react", None, force=False, verbose=False, backend_port=8000 + 1000, frontend_port=3000 + 1000, db_port=None, redis_port=6379 + 1000, subnet="172.25.0.0/16", prometheus_port=9090 + 1000, grafana_port=3001 + 1000, traefik_port=80 + 1000, traefik_dashboard_port=8080 + 1000, 443 + 1000, project_path=".", overwrite=False
+        "myproject", "react", None, force=False, verbose=False, backend_port=8000 + 1000, frontend_port=3000 + 1000, db_port=None, redis_port=6379 + 1000, subnet="172.25.0.0/16", prometheus_port=9090 + 1000, grafana_port=3001 + 1000, traefik_port=80 + 1000, traefik_dashboard_port=8080 + 1000, traefik_hhtps_port=443 + 1000, project_path=".", overwrite=False
     )
 
 def test_docker_combo_workflow(mock_all_dependencies, mocker):
@@ -85,7 +85,7 @@ def test_docker_combo_workflow(mock_all_dependencies, mocker):
     result = runner.invoke(app, ["create", "myproject", "docker", "fastapi", "vue", "postgresql"])
     assert result.exit_code == 0
     mock_expert_create_mode.assert_called_once_with(
-        "myproject", "docker", ["fastapi", "vue", "postgresql"], force=False, verbose=False, backend_port=8000 + 1000, frontend_port=3000 + 1000, db_port=None, redis_port=6379 + 1000, subnet="172.25.0.0/16", prometheus_port=9090 + 1000, grafana_port=3001 + 1000, traefik_port=80 + 1000, traefik_dashboard_port=8080 + 1000, 443 + 1000, project_path=".", overwrite=False
+        "myproject", "docker", ["fastapi", "vue", "postgresql"], force=False, verbose=False, backend_port=8000 + 1000, frontend_port=3000 + 1000, db_port=None, redis_port=6379 + 1000, subnet="172.25.0.0/16", prometheus_port=9090 + 1000, grafana_port=3001 + 1000, traefik_port=80 + 1000, traefik_dashboard_port=8080 + 1000, traefik_hhtps_port=443 + 1000, project_path=".", overwrite=False
     )
 
 def test_guided_mode_workflow(mock_all_dependencies, mocker):
