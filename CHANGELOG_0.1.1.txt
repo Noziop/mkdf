@@ -1,0 +1,7 @@
+514e5fb Create FUNDING.yml
+3ddc855 feat(templates): add infrastructure services and web interface tests
+9543bce feat(templates): support dynamic .env for multi-db and multi-component projects
+a681837 refactor(core): enhance template and docker project creation
+5c09980 feat(cli): improve multi-component support and validation
+b7cd475 chore(deps): update dependencies and documentation
+271c51a feat!: migrate entire codebase from C to Python

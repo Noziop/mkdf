@@ -14,10 +14,10 @@
 - [ ] Router setup
 
 ## Bugs à fixer 🐛
-- [ ] Brace expansion patterns complexes
-- [ ] Progress.update() task_id missing when using mkdf 'path'
-- [ ] Debug why mkdf backend{/core/__init__.py,__init__.py} doesn't create the backend/__init__.py, bu create core/__init__.py
+- [x] Brace expansion patterns complexes
+- [x] Progress.update() task_id missing when using mkdf 'path'
+- [x] Debug why mkdf backend{/core/__init__.py,__init__.py} doesn't create the backend/__init__.py, bu create core/__init__.py
 
 ## V0.1.0 Release 🚀
-- [/] Documentation
-- [ ] GitHub push
+- [x] Documentation
+- [x] GitHub push
