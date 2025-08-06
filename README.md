@@ -12,38 +12,21 @@
 
 ---
 
-## 🛑 Hop hop hop. Minute Papillon!  
-*(Or as they say: “Woah woah woah, minute darling.”)*
-
-**Are you REALLY gonna ship that next project by coding it from scaffolding to delivery? REALLY???**
-
-> **DUDE:**  
-> ```
-> mkdf create my_neat_project backend_tech frontend_tech bla bla bla
-> ```
-> There you go.  
-> Just check: `mkdf --help`  
-> Or even better: `mkdf create --help`.  
-> There you go, love. 🚀
-
----
-
 ## What is MKDF?
-
-*one said it means: *Make Directories and Files*, yet some say it means *Make Dat Fucker Create* (we love you, Noziop).*
 
 > **One command to create them all, one command to find all ports and subnet, and in the docker-compose bind them.**
 
-MKDF is a professional, open source project structure generator for all developers: from juniors who want to learn fast or discover new frameworks, architects who want to go even faster, to DevOps who want everything automated.
+MKDF is a professional, open source project structure generator for all developers:  
+from juniors who want to learn fast or discover new frameworks, architects who want to go even faster, to DevOps who want everything automated.
 
 - **Modern stack**: Python 3.10+, Poetry, automated rebuild script
 - **CLI**: interactive mode built with Typer and Click
-- **Web interface**: FastAPI (SQLModel + Pydantic) + Vue.js 3 + SQLite (huhu, coming soon, sorry for the delay, love.)
+- **Web interface**: FastAPI (SQLModel + Pydantic) + Vue.js 3 + SQLite (coming soon, sorry for the delay, love.)
 - **Usage highlights:**
-  - No arguments → launch CLI interactive mode, with a clear terminal
+  - No arguments → launch CLI interactive mode, clear terminal
   - Path with brace expansion → create dirs/files simultaneously (mkdir + touch)
   - `create` command → guided or one-liner, for templates or docker combos
-- **Docker combos:** multi-service docker combos, with automatic port & subnet conflict-detection (yup! you dreamed it, we did it.)
+- **Docker combos:** multi-service docker combos with automatic port & subnet conflict-detection (yup! you dreamed it, we did it.)
 
 > Project philosophy: **"Cherish your git flow or perish!"**
 
@@ -60,7 +43,7 @@ MKDF is a professional, open source project structure generator for all develope
 - ✅ **Brace Expansion**: power-create with `{dir1,dir2}/{file1,file2}`
 
 **Work in progress:**
-- 🔧 **.env generation**: needs refinement ([TODO](test_mkdf/TODO.md))
+- 🔧 **.env generation**: needs refinement
 - 🔧 **Backend Templates**: SQLite defaults, Poetry integration
 - 🔧 **Web Interface**: under migration (FastAPI + Vue.js modernization)
 
@@ -72,14 +55,17 @@ MKDF is a professional, open source project structure generator for all develope
 **Why share this early?**  
 We believe in transparent development. MKDF already solves real developer pains — community feedback helps us prioritize the RIGHT improvements.
 
+> PLEASE SHARE YOUR FEEDBACK, SUGGESTIONS, AND IMPROVEMENTS : [GitHub Issues](https://github.com/Noziop/mkdf/issues)
+> PLEASE, Onboard your ideas, suggestions, and improvements. We love them all : and we need your help to make MKDF even better! Become part of the community! **lonely, i feel so lonely...**
+
 **Recommended usage:** CLI interface for all operations. Avoid web interface until migration completes.
 
 ---
 
 ## ⚠️ Legacy Status Info
 
-- **CLI Interface**: ✅ Fully operational  
-- **CMD path/template/docker-combos**: ✅ Fully operational  
+- **CLI Interface**: ✅ Fully operational
+- **CMD path/template/docker-combos**: ✅ Fully operational
 - **Web Interface**: 🔄 Under stack migration — temporarily non-functional
 
 > The web server starts but project creation is currently unavailable due to ongoing migration (FastAPI + Vue.js modernization).
@@ -97,7 +83,7 @@ git clone https://github.com/Noziop/mkdf.git ~/mkdf && cd ~/mkdf
 # Install the package
 pip install -e .  # will be pushed on PyPI soon
 
-# Or use the...
+# Or:
 ./rebuild_mkdf.sh
 # Automated (re)build & install: stops webserver if active, (re)builds the package, proposes restart.
 ```
@@ -112,15 +98,6 @@ pip install -e .  # will be pushed on PyPI soon
 mkdf --help
 
 Usage: mkdf [OPTIONS] COMMAND [ARGS]...
-MKDF - Professional project structure creator
-
-Options:
-  --interactive   Launch interactive mode
-  --help          Show this message and exit.
-
-Commands:
-  create          Create a new project from template or Docker combo.
-  web             Launch internal web server (not SaaS)
 ```
 
 ### 1. CLI Example
@@ -151,11 +128,11 @@ tree -h my-stack
 
 ## Documentation and Organization
 
-- Templates: docs/templates.md  
-- CLI: docs/JUNIOR.md  
-- Web UI usage: docs/LAZYDEV.md  
-- Docker combos, advanced: docs/SENIOR.md  
-- Hardcore/Godmode: docs/GODMODE.md  
+- Templates: docs/templates.md
+- CLI: docs/JUNIOR.md
+- Web UI usage: docs/LAZYDEV.md
+- Docker combos, advanced: docs/SENIOR.md
+- Hardcore/Godmode: docs/GODMODE.md
 - Fun facts/philosophy: docs/FUN_FACTS.md
 
 > *Logging/log rotation not yet implemented. Coming soon!*
@@ -202,4 +179,3 @@ We believe ALL improvements should benefit the whole community. AGPL ensures tha
 ---
 
 > **Sometimes, the only thing that matters is to get things done. Fast.**
-```
