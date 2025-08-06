@@ -12,32 +12,7 @@
 
 ---
 
-**Some Gallic passion and a sprinkle of ‘love’ may remain.
-Welcome to "mon monde", dude.**
-
----
-
-## 🛑 Hop hop hop. Minute Papillon!
-*(Or as they say: “Woah woah woah, minute darling.”)*
-
-**Are you REALLY gonna ship that next project by coding it from scaffolding to delivery? REALLY???**
-
-> **DUDE:**  
-> ```
-> mkdf create my-f-api fastapi
-> ```
-> There you go.  
-> Just check: `mkdf --help`  
-> Or even better: `mkdf create --help`.  
-> There you go, love. 🚀
-
----
-
 ## What is MKDF?
-
-> *One said it means: Make Directories and Files,*  
-> *yet some say it means: Make Dat Fucker Create*  
-> *(oopsie woopsie ?! rude again? really ??)*
 
 > **One command to create them all, one command to find all ports and subnet, and in the docker-compose bind them.**
 
@@ -68,7 +43,7 @@ from juniors who want to learn fast or discover new frameworks, architects who w
 - ✅ **Brace Expansion**: power-create with `{dir1,dir2}/{file1,file2}`
 
 **Work in progress:**
-- 🔧 **.env generation**: needs refinement ([TODO](test_mkdf/TODO.md))
+- 🔧 **.env generation**: needs refinement
 - 🔧 **Backend Templates**: SQLite defaults, Poetry integration
 - 🔧 **Web Interface**: under migration (FastAPI + Vue.js modernization)
 
