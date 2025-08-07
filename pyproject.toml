@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "mkdf"
-version = "0.1.1"
+version = "0.1.2"
 description = "Make Directories and Files - Professional Project Creator with Rich CLI and Web UI"
 authors = ["Fassih Belmokhtar <contact@fassih.ch>"]
 license = "AGPL-3.0"
