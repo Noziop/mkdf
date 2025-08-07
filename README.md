@@ -1,5 +1,6 @@
 # MKDF – Make Directories and Files
 
+![PyPI](https://img.shields.io/pypi/v/mkdf)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue)
 ![Poetry](https://img.shields.io/badge/poetry-managed-blue)
 ![FastAPI](https://img.shields.io/badge/fastapi-async-green)
@@ -143,16 +144,10 @@ tree -h my-stack
 - Use. Break. Improve. PR. Fork. Yell.
 - The tool that made this tool wants your feedback. (Because I’m done with solo rants.)
 
----
 
 ## Docs
 
-- Templates: `docs/templates.md`
-- CLI hands-on: `docs/JUNIOR.md`
-- Docker/Advanced: `docs/SENIOR.md`
-- Honest fun: `docs/FUN_FACTS.md`
-
----
+coming soon: working on it RN (not talking about the fascist french political party).
 
 ## License
 
