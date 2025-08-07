@@ -1,6 +1,6 @@
 # TODO - Points à corriger ou améliorer (tests CLI mkdf)
 
-- [ ] Génération du .env : la variable DATABASE_URL ne doit apparaître que si une base de données est explicitement demandée lors de la création d'un projet (ex : mkdf create test-tpl fastapi --force ne devrait pas générer DATABASE_URL)
+- [x] Génération du .env : la variable DATABASE_URL ne doit apparaître que si une base de données est explicitement demandée lors de la création d'un projet (ex : mkdf create test-tpl fastapi --force ne devrait pas générer DATABASE_URL)
 
 ## Proposition d'amélioration pour les templates backend
 

@@ -78,6 +78,10 @@ class DockerComposeFactory:
         db_configs = detect_all_database_services(components)
         for db_config in db_configs:
             env_vars.extend(db_config['env_vars'])
+            
+            # Add DATABASE_URL for backends that need it
+            if backend_type in ['fastapi', 'flask', 'django']:
+                env_vars.append(f'DATABASE_URL={db_config["url_template"]}')
         
         if backend_type:
             env_vars.extend(['SECRET_KEY=your-super-secret-key-here', 'DEBUG=true'])
