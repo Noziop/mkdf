@@ -80,7 +80,7 @@ class DockerComposeFactory:
             env_vars.extend(db_config['env_vars'])
             
             # Add DATABASE_URL for backends that need it
-            if backend_type in ['fastapi', 'flask', 'django']:
+            if backend_type in ['fastapi', 'flask', 'django', 'express']:
                 env_vars.append(f'DATABASE_URL={db_config["url_template"]}')
         
         if backend_type:
